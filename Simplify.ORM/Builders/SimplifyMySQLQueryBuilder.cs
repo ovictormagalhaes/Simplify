@@ -1,6 +1,8 @@
-﻿namespace Simplify.ORM.MySQL
+﻿using Simplify.ORM.Interfaces;
+
+namespace Simplify.ORM.Builders
 {
-    public class SimplifyMySQLQuery : BaseSimplifyQuery
+    public class SimplifyMySQLQueryBuilder : SimplifyQueryBuilder
     {
         override
         public string FormatTable(string table)
@@ -15,7 +17,7 @@
         }
 
         override
-        public ISimplifyQuery AddTop(int top)
+        public ISimplifyQueryBuilder AddTop(int top)
         {
             return this;
         }

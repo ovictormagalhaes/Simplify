@@ -1,8 +1,10 @@
-using Simplify.ORM.SQLServer;
+using Simplify.ORM.Builders;
+using Simplify.ORM.Enumerations;
+using Xunit;
 
-namespace Simplify.ORM.Test.SQLServer
+namespace Simplify.ORM.Test.Builders
 {
-    public class SimplifySQLServerQueryTest
+    public class SimplifySQLServerQueryBuilderTest
     {
         [Fact]
         public void SelectFieldsTest()
@@ -10,10 +12,10 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName = "User";
             var columns = new List<string> { "UserId", "Username", "Password" };
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .SelectFields(tableName, columns);
 
-            var expected = "SELECT [User].[UserId], [User].[Username], [User].[Password]";
+            var expected = "SELECT [User].[UserId], [User].[Username], [User].[Password] ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -27,11 +29,11 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName2 = "Permission";
             var columns2 = new List<string> { "PermissionId", "UserId", "Value" };
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .SelectFields(tableName, columns)
                 .SelectFields(tableName2, columns2);
 
-            var expected = "SELECT [User].[UserId], [User].[Username], [User].[Password], [Permission].[PermissionId], [Permission].[UserId], [Permission].[Value]";
+            var expected = "SELECT [User].[UserId], [User].[Username], [User].[Password], [Permission].[PermissionId], [Permission].[UserId], [Permission].[Value] ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -41,10 +43,10 @@ namespace Simplify.ORM.Test.SQLServer
         {
             var tableName = "User";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .SelectAllFields(tableName);
 
-            var expected = "SELECT [User].*";
+            var expected = "SELECT [User].* ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -55,11 +57,11 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName = "User";
             var columns = new List<string> { "UserId", "Username", "Password" };
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .Top(10)
                 .SelectFields(tableName, columns);
 
-            var expected = "SELECT TOP 10 [User].[UserId], [User].[Username], [User].[Password]";
+            var expected = "SELECT TOP 10 [User].[UserId], [User].[Username], [User].[Password] ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -69,10 +71,10 @@ namespace Simplify.ORM.Test.SQLServer
         {
             var tableName = "User";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .From(tableName);
 
-            var expected = "FROM [User]";
+            var expected = "FROM [User] ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -82,10 +84,10 @@ namespace Simplify.ORM.Test.SQLServer
         {
             var tableName = "User";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .From(tableName, "u");
 
-            var expected = "FROM [User] u";
+            var expected = "FROM [User] u ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -95,10 +97,10 @@ namespace Simplify.ORM.Test.SQLServer
         [Fact]
         public void JoinTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .Join("Permission", "UserId", "User", "UserId");
 
-            var expected = "JOIN [Permission] ON [Permission].[UserId] = [User].[UserId]";
+            var expected = "JOIN [Permission] ON [Permission].[UserId] = [User].[UserId] ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -106,10 +108,10 @@ namespace Simplify.ORM.Test.SQLServer
         [Fact]
         public void InnerJoinTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .InnerJoin("Permission", "UserId", "User", "UserId");
 
-            var expected = "INNER JOIN [Permission] ON [Permission].[UserId] = [User].[UserId]";
+            var expected = "INNER JOIN [Permission] ON [Permission].[UserId] = [User].[UserId] ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -117,10 +119,10 @@ namespace Simplify.ORM.Test.SQLServer
         [Fact]
         public void LeftJoinTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .LeftJoin("Permission", "UserId", "User", "UserId");
 
-            var expected = "LEFT JOIN [Permission] ON [Permission].[UserId] = [User].[UserId]";
+            var expected = "LEFT JOIN [Permission] ON [Permission].[UserId] = [User].[UserId] ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -128,10 +130,10 @@ namespace Simplify.ORM.Test.SQLServer
         [Fact]
         public void RightJoinTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .RightJoin("Permission", "UserId", "User", "UserId");
 
-            var expected = "RIGHT JOIN [Permission] ON [Permission].[UserId] = [User].[UserId]";
+            var expected = "RIGHT JOIN [Permission] ON [Permission].[UserId] = [User].[UserId] ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -146,13 +148,13 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName = "User";
             var column = "UserId";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals(tableName, column, 1);
 
-            var expected = "WHERE [User].[UserId] = @UserId0";
+            var expected = "WHERE [User].[UserId] = @UserId0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
         }
 
         [Fact]
@@ -161,13 +163,13 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName = "User";
             var column = "UserId";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereNotEquals(tableName, column, 1);
 
-            var expected = "WHERE [User].[UserId] <> @UserId0";
+            var expected = "WHERE [User].[UserId] <> @UserId0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
         }
 
         [Fact]
@@ -176,13 +178,13 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName = "User";
             var column = "UserId";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereGreater(tableName, column, 1);
 
-            var expected = "WHERE [User].[UserId] > @UserId0";
+            var expected = "WHERE [User].[UserId] > @UserId0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
         }
 
         [Fact]
@@ -191,13 +193,13 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName = "User";
             var column = "UserId";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereGreaterOrEqual(tableName, column, 1);
 
-            var expected = "WHERE [User].[UserId] >= @UserId0";
+            var expected = "WHERE [User].[UserId] >= @UserId0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
         }
 
         [Fact]
@@ -206,13 +208,13 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName = "User";
             var column = "UserId";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereLower(tableName, column, 1);
 
-            var expected = "WHERE [User].[UserId] < @UserId0";
+            var expected = "WHERE [User].[UserId] < @UserId0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
         }
 
         [Fact]
@@ -221,13 +223,13 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName = "User";
             var column = "UserId";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereLowerOrEqual(tableName, column, 1);
 
-            var expected = "WHERE [User].[UserId] <= @UserId0";
+            var expected = "WHERE [User].[UserId] <= @UserId0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
         }
 
         [Fact]
@@ -236,14 +238,14 @@ namespace Simplify.ORM.Test.SQLServer
             var tableName = "User";
             var column = "UserId";
 
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereBetween(tableName, column, 1, 10);
 
-            var expected = "WHERE [User].[UserId] BETWEEN @UserId0 AND @UserId1";
+            var expected = "WHERE [User].[UserId] BETWEEN @UserId0 AND @UserId1 ;";
 
             Assert.Equal(expected, query.BuildQuery());
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "UserId1", 10);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId1", 10);
         }
 
         #endregion
@@ -253,108 +255,108 @@ namespace Simplify.ORM.Test.SQLServer
         [Fact]
         public void AndEqualsTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .AndEquals("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] = @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] = @Permission0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
 
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void AndNotEqualsTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .AndNotEquals("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] <> @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] <> @Permission0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
 
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void AndGreaterTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .AndGreater("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] > @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] > @Permission0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
 
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
 
         [Fact]
         public void AndGreaterOrEqualsTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .AndGreaterOrEqual("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] >= @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] >= @Permission0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
 
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void AndLowerTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .AndLower("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] < @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] < @Permission0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
 
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void AndLowerOrEqualsTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .AndLowerOrEqual("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] <= @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] <= @Permission0 ;";
 
             Assert.Equal(expected, query.BuildQuery());
 
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void AndBetweenTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .AndBetween("User", "Permission", 10, 20);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] BETWEEN @Permission0 AND @Permission1";
+            var expected = "WHERE [User].[UserId] = @UserId0 AND [User].[Permission] BETWEEN @Permission0 AND @Permission1 ;";
 
             Assert.Equal(expected, query.BuildQuery());
 
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 10);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission1", 20);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 10);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission1", 20);
         }
 
         #endregion
@@ -364,122 +366,122 @@ namespace Simplify.ORM.Test.SQLServer
         [Fact]
         public void OrEqualsTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .OrEquals("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] = @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] = @Permission0 ;";
 
             var actual = query.BuildQuery();
 
             Assert.Equal(expected, actual);
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void OrNotEqualsTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .OrNotEquals("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] <> @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] <> @Permission0 ;";
 
             var actual = query.BuildQuery();
 
             Assert.Equal(expected, actual);
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void OrGreaterTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .OrGreater("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] > @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] > @Permission0 ;";
 
             var actual = query.BuildQuery();
 
             Assert.Equal(expected, actual);
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
 
         [Fact]
         public void OrGreaterOrEqualsTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .OrGreaterEqual("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] >= @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] >= @Permission0 ;";
 
             var actual = query.BuildQuery();
 
             Assert.Equal(expected, actual);
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void OrLowerTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .OrLower("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] < @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] < @Permission0 ;";
 
             var actual = query.BuildQuery();
 
             Assert.Equal(expected, actual);
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void OrLowerOrEqualsTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .OrLowerEqual("User", "Permission", 2);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] <= @Permission0";
+            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] <= @Permission0 ;";
 
             var actual = query.BuildQuery();
 
             Assert.Equal(expected, actual);
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 2);
         }
 
         [Fact]
         public void OrBetweenTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .OrBetween("User", "Permission", 10, 20);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] BETWEEN @Permission0 AND @Permission1";
+            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] BETWEEN @Permission0 AND @Permission1 ;";
 
             var actual = query.BuildQuery();
 
             Assert.Equal(expected, actual);
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 10);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission1", 20);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 10);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission1", 20);
         }
 
 
         [Fact]
         public void ComplexOrTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .WhereEquals("User", "UserId", 1)
                 .OrEquals("User", "Permission", 10)
                 .OrNotEquals("User", "Permission", 11)
@@ -488,32 +490,32 @@ namespace Simplify.ORM.Test.SQLServer
                 .OrLower("User", "Permission", 14)
                 .OrLowerEqual("User", "Permission", 15);
 
-            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] = @Permission0 OR [User].[Permission] <> @Permission1 OR [User].[Permission] > @Permission2 OR [User].[Permission] >= @Permission3 OR [User].[Permission] < @Permission4 OR [User].[Permission] <= @Permission5";
+            var expected = "WHERE [User].[UserId] = @UserId0 OR [User].[Permission] = @Permission0 OR [User].[Permission] <> @Permission1 OR [User].[Permission] > @Permission2 OR [User].[Permission] >= @Permission3 OR [User].[Permission] < @Permission4 OR [User].[Permission] <= @Permission5 ;";
 
             var actual = query.BuildQuery();
 
             Assert.Equal(expected, actual);
-            SimplifyQueryAsserts.AssertParameter(query, "UserId0", 1);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission0", 10);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission1", 11);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission2", 12);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission3", 13);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission4", 14);
-            SimplifyQueryAsserts.AssertParameter(query, "Permission5", 15);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "UserId0", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission0", 10);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission1", 11);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission2", 12);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission3", 13);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission4", 14);
+            SimplifyQueryBuilderAsserts.AssertParameter(query, "Permission5", 15);
         }
 
         #endregion
 
         #region Order By
-        
+
         [Fact]
         public void OrderByTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .OrderBy("User", "Username", SimplifyOrderOperation.Asc)
                 .OrderBy("User", "Name", SimplifyOrderOperation.Desc);
 
-            var expected = "ORDER BY [User].[Username] ASC, [User].[Name] DESC";
+            var expected = "ORDER BY [User].[Username] ASC , [User].[Name] DESC ;";
 
             Assert.Equal(expected, query.BuildQuery());
         }
@@ -523,7 +525,7 @@ namespace Simplify.ORM.Test.SQLServer
         [Fact]
         public void QueryTest()
         {
-            var query = new SimplifySQLServerQuery()
+            var query = new SimplifySQLServerQueryBuilder()
                 .SelectFields("User", new List<string> { "UserId", "Username", "Password" })
                 .From("User")
                 .InnerJoin("Permission", "UserId", "User", "UserId")
@@ -533,7 +535,7 @@ namespace Simplify.ORM.Test.SQLServer
                 .AndLower("Permission", "Permission", 50);
             ;
 
-            var expected = "SELECT [User].[UserId], [User].[Username], [User].[Password] FROM [User] INNER JOIN [Permission] ON [Permission].[UserId] = [User].[UserId] WHERE [User].[UserId] = @UserId0 AND [Permission].[Permission] = @Permission0 OR [Permission].[Permission] > @Permission1 AND [Permission].[Permission] < @Permission2";
+            var expected = "SELECT [User].[UserId], [User].[Username], [User].[Password] FROM [User] INNER JOIN [Permission] ON [Permission].[UserId] = [User].[UserId] WHERE [User].[UserId] = @UserId0 AND [Permission].[Permission] = @Permission0 OR [Permission].[Permission] > @Permission1 AND [Permission].[Permission] < @Permission2 ;";
             Assert.Equal(expected, query.BuildQuery());
         }
     }

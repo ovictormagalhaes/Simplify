@@ -1,6 +1,8 @@
-﻿namespace Simplify.ORM.PostgresSQL
+﻿using Simplify.ORM.Interfaces;
+
+namespace Simplify.ORM.Builders
 {
-    public class SimplifyPostgresSQLQuery : BaseSimplifyQuery
+    public class SimplifyPostgresSQLQueryBuilder : SimplifyQueryBuilder
     {
         override
         public string FormatTable(string table)
@@ -15,7 +17,7 @@
         }
 
         override
-        public ISimplifyQuery AddTop(int top)
+        public ISimplifyQueryBuilder AddTop(int top)
         {
             return this;
         }

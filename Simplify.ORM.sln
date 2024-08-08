@@ -3,12 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34616.47
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simplify.ORM", "Simplify.ORM\Simplify.ORM.csproj", "{33C63650-15D4-421B-96DA-C51EAE201DD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simplify.ORM", "Simplify.ORM\Simplify.ORM.csproj", "{33C63650-15D4-421B-96DA-C51EAE201DD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simplify.ORM.Test", "Simplify.ORM.Test\Simplify.ORM.Test.csproj", "{44E09268-7304-47C6-981B-14DED1B47D59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simplify.ORM.Test", "Simplify.ORM.Test\Simplify.ORM.Test.csproj", "{44E09268-7304-47C6-981B-14DED1B47D59}"
 	ProjectSection(ProjectDependencies) = postProject
 		{33C63650-15D4-421B-96DA-C51EAE201DD1} = {33C63650-15D4-421B-96DA-C51EAE201DD1}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simplify.ORM.Generator", "Simplify.ORM.Generator\Simplify.ORM.Generator.csproj", "{D4F55239-8239-429C-9F5A-1E5846D481AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +26,10 @@ Global
 		{44E09268-7304-47C6-981B-14DED1B47D59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44E09268-7304-47C6-981B-14DED1B47D59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44E09268-7304-47C6-981B-14DED1B47D59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4F55239-8239-429C-9F5A-1E5846D481AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4F55239-8239-429C-9F5A-1E5846D481AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4F55239-8239-429C-9F5A-1E5846D481AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4F55239-8239-429C-9F5A-1E5846D481AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,8 @@
-﻿namespace Simplify.ORM.SQLServer
+﻿using Simplify.ORM.Interfaces;
+
+namespace Simplify.ORM.Builders
 {
-    public class SimplifySQLServerQuery : BaseSimplifyQuery
+    public class SimplifySQLServerQueryBuilder : SimplifyQueryBuilder
     {
         override
         public string FormatTable(string table)
@@ -15,7 +17,7 @@
         }
 
         override
-        public ISimplifyQuery AddLimit(int limit)
+        public ISimplifyQueryBuilder AddLimit(int limit)
         {
             return this;
         }

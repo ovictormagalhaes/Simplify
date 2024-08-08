@@ -1,8 +1,16 @@
 ﻿using System.Text;
+using Simplify.ORM.Enumerations;
+using Simplify.ORM.Interfaces;
 
-namespace Simplify.ORM
+namespace Simplify.ORM.Builders
 {
-    public abstract partial class BaseSimplifyQuery : ISimplifyQuery
+    public class InsertColumn
+    {
+        public string? Column { get; set; }
+        public string? Parameter { get; set; }
+    }
+
+    public abstract partial class SimplifyQueryBuilder : ISimplifyQueryBuilder
     {
         public string Query { get => BuildQuery(); }
         protected Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
@@ -12,6 +20,9 @@ namespace Simplify.ORM
         protected List<Tuple<SimplifyOrderOperation, string>> OrdersBy { get; set; } = new List<Tuple<SimplifyOrderOperation, string>>();
         protected int? TopValue { get; set; }
         protected int? LimitValue { get; set; }
+
+        protected string? InsertTable { get; set; }
+        protected List<InsertColumn> InsertsColumn { get; set; } = new List<InsertColumn>();
 
         public virtual string BuildQuery()
         {
@@ -37,15 +48,16 @@ namespace Simplify.ORM
 
             if (Wheres.Any())
                 sb.Append($"{GetWhereOperationSymbol(SimplifyWhereOperation.Where)} ");
+
             foreach (var where in Wheres)
             {
                 var operationSymbol = GetWhereOperationSymbol(where.Operation);
-                var parameterName = !string.IsNullOrEmpty(where.ParameterName) ? FormatParameterName(where.ParameterName) : null;
+                var parameterName = !string.IsNullOrEmpty(where.ParameterName) ? FormatParameterName(where.ParameterName!) : null;
 
                 if (!string.IsNullOrEmpty(where.LeftTable) && !string.IsNullOrEmpty(where.LeftColumn))
                 {
-                    var table = FormatTable(where.LeftTable);
-                    var column = FormatColumn(where.LeftColumn);
+                    var table = FormatTable(where.LeftTable!);
+                    var column = FormatColumn(where.LeftColumn!);
                     sb.Append($"{table}.{column} {operationSymbol} {parameterName} ");
                 }
                 else
@@ -61,57 +73,51 @@ namespace Simplify.ORM
                     var operationSymbol = GetOrderByOperationSymbol(x.Item1);
                     var value = x.Item2;
 
-                    return $"{value} {operationSymbol}";
+                    return $"{value} {operationSymbol} ";
                 });
 
                 sb.Append(string.Join(", ", orderByText));
 
             }
 
-
             if (LimitValue.HasValue)
-                sb.Append($"LIMIT {LimitValue}");
+                sb.Append($"LIMIT {LimitValue} ");
 
-            sb.Append(";");
+            if (!string.IsNullOrEmpty(InsertTable) && InsertsColumn.Any())
+            {
+                var formattedTable = FormatTable(InsertTable!);
+                var columns = string.Join(", ", InsertsColumn.Select(c => FormatColumn(c.Column!)));
+                var values = string.Join(", ", InsertsColumn.Select(c => FormatParameterName(c.Parameter!)));
 
-            return sb.ToString().Replace("  ", " ").TrimEnd();
+                sb.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2})", formattedTable, columns, values);
+            }
+
+            return sb.Append(";").ToString().Replace("  ", " ").TrimEnd();
         }
 
         public Dictionary<string, object> GetParameters() => Parameters;
 
         #region Format
 
-        public virtual string FormatTable(string table)
-        {
-            return table;
-        }
+        public virtual string FormatTable(string table) => table;
 
-        public virtual string FormatColumn(string column)
-        {
-            return column;
-        }
+        public virtual string FormatColumn(string column) => column;
 
-        public virtual string FormatTableColumn(string table, string column)
-        {
-            return $"{FormatTable(table)}.{FormatColumn(column)}";
-        }
+        public virtual string FormatTableColumn(string table, string column) => $"{FormatTable(table)}.{FormatColumn(column)}";
 
-        public virtual string FormatParameterName(string parameter)
-        {
-            return $"@{parameter}";
-        }
+        public virtual string FormatParameterName(string parameter) => $"@{parameter}";
 
         #endregion
 
         #region Add
 
-        public virtual ISimplifyQuery AddParameter(string name, object value)
+        public virtual ISimplifyQueryBuilder AddParameter(string name, object value)
         {
             Parameters.Add(name, value);
             return this;
         }
 
-        public virtual ISimplifyQuery AddSelect(string table, string column)
+        public virtual ISimplifyQueryBuilder AddSelect(string table, string column)
         {
             if (string.IsNullOrEmpty(column))
                 Selects.Add($"{FormatTable(table)}.*");
@@ -120,25 +126,25 @@ namespace Simplify.ORM
             return this;
         }
 
-        public virtual ISimplifyQuery AddSelect(Tuple<string, string> tableColumn)
+        public virtual ISimplifyQueryBuilder AddSelect(Tuple<string, string> tableColumn)
         {
             return AddSelect(tableColumn.Item1, tableColumn.Item2);
         }
 
-        public virtual ISimplifyQuery AddSelect(List<Tuple<string, string>> tableColumns)
+        public virtual ISimplifyQueryBuilder AddSelect(List<Tuple<string, string>> tableColumns)
         {
             foreach (var tableColumn in tableColumns)
                 AddSelect(tableColumn);
             return this;
         }
 
-        public virtual ISimplifyQuery AddTop(int top)
+        public virtual ISimplifyQueryBuilder AddTop(int top)
         {
             TopValue = top;
             return this;
         }
 
-        public ISimplifyQuery AddFrom(string table, string? alias = null)
+        public ISimplifyQueryBuilder AddFrom(string table, string? alias = null)
         {
             if (!string.IsNullOrEmpty(alias))
                 Joins.Add(new Tuple<SimplifyJoinOperation, string>(SimplifyJoinOperation.From, $"{FormatTable(table)} {alias}"));
@@ -147,25 +153,25 @@ namespace Simplify.ORM
             return this;
         }
 
-        public ISimplifyQuery AddJoin(SimplifyJoinOperation operation, string table)
+        public ISimplifyQueryBuilder AddJoin(SimplifyJoinOperation operation, string table)
         {
             Joins.Add(new Tuple<SimplifyJoinOperation, string>(operation, FormatTable(table)));
             return this;
         }
 
-        public ISimplifyQuery AddJoin(SimplifyJoinOperation operation, string table, string column)
+        public ISimplifyQueryBuilder AddJoin(SimplifyJoinOperation operation, string table, string column)
         {
             Joins.Add(new Tuple<SimplifyJoinOperation, string>(operation, $"{FormatTable(table)}.{FormatColumn(column)}"));
             return this;
         }
 
-        public ISimplifyQuery AddWhere(SimplifyWhereOperation operation)
+        public ISimplifyQueryBuilder AddWhere(SimplifyWhereOperation operation)
         {
             Wheres.Add(new WhereOperation(operation));
             return this;
         }
 
-        public ISimplifyQuery AddWhere(SimplifyWhereOperation operation, string table, string column, object value)
+        public ISimplifyQueryBuilder AddWhere(SimplifyWhereOperation operation, string table, string column, object value)
         {
             var parameterName = GetParameterName(column);
 
@@ -175,7 +181,7 @@ namespace Simplify.ORM
             return this;
         }
 
-        public ISimplifyQuery AddWhere(SimplifyWhereOperation operation, string parameter, object value)
+        public ISimplifyQueryBuilder AddWhere(SimplifyWhereOperation operation, string parameter, object value)
         {
             var parameterName = GetParameterName(parameter);
 
@@ -185,20 +191,38 @@ namespace Simplify.ORM
             return this;
         }
 
-        public virtual ISimplifyQuery AddLimit(int limit)
+        public virtual ISimplifyQueryBuilder AddLimit(int limit)
         {
             LimitValue = limit;
             return this;
         }
 
-        public ISimplifyQuery AddOrderBy(string table, string column, SimplifyOrderOperation operation = SimplifyOrderOperation.Asc)
+        public ISimplifyQueryBuilder AddOrderBy(string table, string column, SimplifyOrderOperation operation = SimplifyOrderOperation.Asc)
         {
             OrdersBy.Add(new Tuple<SimplifyOrderOperation, string>(operation, $"{FormatTable(table)}.{FormatColumn(column)}"));
             return this;
         }
 
-        #endregion
+        public ISimplifyQueryBuilder AddInsert(string table, Dictionary<string, object> columns)
+        {
+            InsertTable = table;
 
+            foreach (var column in columns)
+            {
+                var parameter = GetParameterName(column.Key);
+                var item = new InsertColumn
+                {
+                    Column = column.Key,
+                    Parameter = parameter,
+                };
+                AddParameter(parameter, column.Value);
+                InsertsColumn.Add(item);
+            }
+
+            return this;
+        }
+
+        #endregion
 
         public virtual string GetJoinOperationSymbol(SimplifyJoinOperation operation) => operation switch
         {
@@ -249,22 +273,22 @@ namespace Simplify.ORM
 
         #region Select
 
-        public ISimplifyQuery SelectFields(string tableName, List<string> columns)
+        public ISimplifyQueryBuilder SelectFields(string tableName, List<string> columns)
         {
             var selects = columns.Select(c => new Tuple<string, string>(tableName, c)).ToList();
 
             return AddSelect(selects);
         }
 
-        public ISimplifyQuery SelectAllFields(string tableName)
+        public ISimplifyQueryBuilder SelectAllFields(string tableName)
             => AddSelect(tableName, string.Empty);
 
-        public ISimplifyQuery Top(int top)
+        public ISimplifyQueryBuilder Top(int top)
         {
             return AddTop(top);
         }
 
-        public ISimplifyQuery Limit(int limit)
+        public ISimplifyQueryBuilder Limit(int limit)
         {
             return AddLimit(limit);
         }
@@ -273,58 +297,58 @@ namespace Simplify.ORM
 
         #region Join
 
-        private ISimplifyQuery JoinBase(SimplifyJoinOperation operation, string rightTable, string rightColumn, string leftTable, string leftColumn)
+        private ISimplifyQueryBuilder JoinBase(SimplifyJoinOperation operation, string rightTable, string rightColumn, string leftTable, string leftColumn)
         {
             return AddJoin(operation, rightTable)
                 .AddJoin(SimplifyJoinOperation.On, rightTable, rightColumn)
                 .AddJoin(SimplifyJoinOperation.Equals, leftTable, leftColumn);
         }
 
-        public ISimplifyQuery From(string tableName, string? alias = null)
+        public ISimplifyQueryBuilder From(string tableName, string? alias = null)
             => AddFrom(tableName, alias);
 
-        public ISimplifyQuery Join(string rightTable, string rightColumn, string leftTable, string leftColumn)
+        public ISimplifyQueryBuilder Join(string rightTable, string rightColumn, string leftTable, string leftColumn)
             => JoinBase(SimplifyJoinOperation.Join, rightTable, rightColumn, leftTable, leftColumn);
 
-        public ISimplifyQuery InnerJoin(string rightTable, string rightColumn, string leftTable, string leftColumn)
+        public ISimplifyQueryBuilder InnerJoin(string rightTable, string rightColumn, string leftTable, string leftColumn)
             => JoinBase(SimplifyJoinOperation.InnerJoin, rightTable, rightColumn, leftTable, leftColumn);
 
-        public ISimplifyQuery LeftJoin(string rightTable, string rightColumn, string leftTable, string leftColumn)
+        public ISimplifyQueryBuilder LeftJoin(string rightTable, string rightColumn, string leftTable, string leftColumn)
             => JoinBase(SimplifyJoinOperation.LeftJoin, rightTable, rightColumn, leftTable, leftColumn);
 
-        public ISimplifyQuery RightJoin(string rightTable, string rightColumn, string leftTable, string leftColumn)
+        public ISimplifyQueryBuilder RightJoin(string rightTable, string rightColumn, string leftTable, string leftColumn)
             => JoinBase(SimplifyJoinOperation.RightJoin, rightTable, rightColumn, leftTable, leftColumn);
 
         #endregion
 
         #region Where
 
-        private ISimplifyQuery WhereBase(SimplifyWhereOperation operation, string tableName, string column, object value, bool conditional)
+        private ISimplifyQueryBuilder WhereBase(SimplifyWhereOperation operation, string tableName, string column, object value, bool conditional)
         {
             if (!conditional) { return this; }
 
             return AddWhere(operation, tableName, column, value);
         }
 
-        public ISimplifyQuery WhereEquals(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder WhereEquals(string tableName, string column, object value, bool conditional = true)
             => WhereBase(SimplifyWhereOperation.Equals, tableName, column, value, conditional);
 
-        public ISimplifyQuery WhereNotEquals(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder WhereNotEquals(string tableName, string column, object value, bool conditional = true)
             => WhereBase(SimplifyWhereOperation.NotEquals, tableName, column, value, conditional);
 
-        public ISimplifyQuery WhereGreater(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder WhereGreater(string tableName, string column, object value, bool conditional = true)
             => WhereBase(SimplifyWhereOperation.Greater, tableName, column, value, conditional);
 
-        public ISimplifyQuery WhereGreaterOrEqual(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder WhereGreaterOrEqual(string tableName, string column, object value, bool conditional = true)
             => WhereBase(SimplifyWhereOperation.GreaterOrEqual, tableName, column, value, conditional);
 
-        public ISimplifyQuery WhereLower(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder WhereLower(string tableName, string column, object value, bool conditional = true)
             => WhereBase(SimplifyWhereOperation.Lower, tableName, column, value, conditional);
 
-        public ISimplifyQuery WhereLowerOrEqual(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder WhereLowerOrEqual(string tableName, string column, object value, bool conditional = true)
             => WhereBase(SimplifyWhereOperation.LowerOrEqual, tableName, column, value, conditional);
 
-        public ISimplifyQuery WhereBetween(string tableName, string column, object from, object to, bool conditional = true)
+        public ISimplifyQueryBuilder WhereBetween(string tableName, string column, object from, object to, bool conditional = true)
         {
             if (!conditional) { return this; }
 
@@ -335,69 +359,69 @@ namespace Simplify.ORM
 
         #region And
 
-        private ISimplifyQuery AndBase(SimplifyWhereOperation operation, string tableName, string column, object value, bool conditional)
+        private ISimplifyQueryBuilder AndBase(SimplifyWhereOperation operation, string tableName, string column, object value, bool conditional)
         {
             if (!conditional) { return this; }
 
             return AddWhere(SimplifyWhereOperation.And).AddWhere(operation, tableName, column, value);
         }
 
-        public ISimplifyQuery AndEquals(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder AndEquals(string tableName, string column, object value, bool conditional = true)
             => AndBase(SimplifyWhereOperation.Equals, tableName, column, value, conditional);
 
-        public ISimplifyQuery AndNotEquals(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder AndNotEquals(string tableName, string column, object value, bool conditional = true)
             => AndBase(SimplifyWhereOperation.NotEquals, tableName, column, value, conditional);
 
-        public ISimplifyQuery AndGreater(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder AndGreater(string tableName, string column, object value, bool conditional = true)
             => AndBase(SimplifyWhereOperation.Greater, tableName, column, value, conditional);
 
-        public ISimplifyQuery AndGreaterOrEqual(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder AndGreaterOrEqual(string tableName, string column, object value, bool conditional = true)
             => AndBase(SimplifyWhereOperation.GreaterOrEqual, tableName, column, value, conditional);
 
-        public ISimplifyQuery AndLower(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder AndLower(string tableName, string column, object value, bool conditional = true)
             => AndBase(SimplifyWhereOperation.Lower, tableName, column, value, conditional);
 
-        public ISimplifyQuery AndLowerOrEqual(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder AndLowerOrEqual(string tableName, string column, object value, bool conditional = true)
             => AndBase(SimplifyWhereOperation.LowerOrEqual, tableName, column, value, conditional);
 
-        public ISimplifyQuery AndBetween(string tableName, string column, object from, object to, bool conditional = true)
+        public ISimplifyQueryBuilder AndBetween(string tableName, string column, object from, object to, bool conditional = true)
             => AndBase(SimplifyWhereOperation.Between, tableName, column, from, conditional).AddWhere(SimplifyWhereOperation.And, column, to);
 
         #endregion
 
         #region Or
-        private ISimplifyQuery OrBase(SimplifyWhereOperation operation, string tableName, string column, object value, bool conditional)
+        private ISimplifyQueryBuilder OrBase(SimplifyWhereOperation operation, string tableName, string column, object value, bool conditional)
         {
             if (!conditional) { return this; }
 
             return AddWhere(SimplifyWhereOperation.Or).AddWhere(operation, tableName, column, value);
         }
 
-        public ISimplifyQuery OrEquals(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder OrEquals(string tableName, string column, object value, bool conditional = true)
             => OrBase(SimplifyWhereOperation.Equals, tableName, column, value, conditional);
 
-        public ISimplifyQuery OrNotEquals(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder OrNotEquals(string tableName, string column, object value, bool conditional = true)
             => OrBase(SimplifyWhereOperation.NotEquals, tableName, column, value, conditional);
 
-        public ISimplifyQuery OrGreater(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder OrGreater(string tableName, string column, object value, bool conditional = true)
             => OrBase(SimplifyWhereOperation.Greater, tableName, column, value, conditional);
 
-        public ISimplifyQuery OrGreaterEqual(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder OrGreaterEqual(string tableName, string column, object value, bool conditional = true)
             => OrBase(SimplifyWhereOperation.GreaterOrEqual, tableName, column, value, conditional);
 
-        public ISimplifyQuery OrLower(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder OrLower(string tableName, string column, object value, bool conditional = true)
             => OrBase(SimplifyWhereOperation.Lower, tableName, column, value, conditional);
 
-        public ISimplifyQuery OrLowerEqual(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder OrLowerEqual(string tableName, string column, object value, bool conditional = true)
             => OrBase(SimplifyWhereOperation.LowerOrEqual, tableName, column, value, conditional);
 
-        public ISimplifyQuery OrBetween(string tableName, string column, object from, object to, bool conditional = true)
+        public ISimplifyQueryBuilder OrBetween(string tableName, string column, object from, object to, bool conditional = true)
             => OrBase(SimplifyWhereOperation.Between, tableName, column, from, conditional).AddWhere(SimplifyWhereOperation.And, column, to);
 
         #endregion
 
         #region Order By
-        public ISimplifyQuery OrderBy(string table, string column, SimplifyOrderOperation operation = SimplifyOrderOperation.Desc)
+        public ISimplifyQueryBuilder OrderBy(string table, string column, SimplifyOrderOperation operation = SimplifyOrderOperation.Desc)
         {
             return AddOrderBy(table, column, operation);
         }
