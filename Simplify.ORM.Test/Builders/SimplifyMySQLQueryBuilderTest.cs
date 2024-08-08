@@ -526,7 +526,7 @@ namespace Simplify.ORM.Test.Builders
         public void QueryTest()
         {
             var query = new SimplifyMySQLQueryBuilder()
-                .SelectFields("User", new List<string> { "UserId", "Username", "Password" })
+                .SelectFields("User", ["UserId", "Username", "Password"])
                 .From("User")
                 .InnerJoin("Permission", "UserId", "User", "UserId")
                 .WhereEquals("User", "UserId", 1)

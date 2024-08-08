@@ -1,23 +1,19 @@
-﻿using Simplify.ORM.Interfaces;
+﻿using Simplify.ORM.Enumerations;
+using Simplify.ORM.Interfaces;
 using System.Text;
 
 namespace Simplify.ORM.Builders
 {
     public class SimplifyCommandBuilder : ISimplifyCommandBuilder
     {
-        protected string? Table { get; set; }
-        protected Dictionary<string, object> Inserts { get; set; } = new Dictionary<string, object>();
-        protected Dictionary<string, object> Updates { get; set; } = new Dictionary<string, object>();
-        protected List<WhereOperation> UpdatesWheres { get; set; } = new List<WhereOperation>();
-
         public string BuildInsertQuery(string table, Dictionary<string, object> columnValues)
         {
             var sb = new StringBuilder();
-            if (Inserts.Any() && !string.IsNullOrEmpty(table))
+            if (!string.IsNullOrEmpty(table) && columnValues.Any())
             {
                 sb.Append($"INSERT INTO {table} (");
                 sb.Append(string.Join(", ", columnValues.Select(x => x.Key)));
-                sb.Append(") VALUES(");
+                sb.Append(") VALUES (");
                 sb.Append(string.Join(", ", columnValues.Select(x => $"@{x.Key}")));
                 sb.Append(");");
                 return sb.ToString();
@@ -26,33 +22,52 @@ namespace Simplify.ORM.Builders
             return string.Empty;
         }
 
-        public string BuildQuery()
+        public string BuildUpdateQuery(string table, Dictionary<string, object> columnValues, List<WhereOperation> whereOperations)
         {
             var sb = new StringBuilder();
-            if (Inserts.Any() && !string.IsNullOrEmpty(Table))
+            if (!string.IsNullOrEmpty(table) && columnValues.Any())
             {
-                sb.Append($"INSERT INTO {Table} (");
-                sb.Append(string.Join(", ", Inserts.Select(x => x.Key)));
-                sb.Append(") VALUES(");
-                sb.Append(string.Join(", ", Inserts.Select(x => $"@{x.Key}")));
-                sb.Append(");");
-                return sb.ToString();
-            }
+                sb.Append($"UPDATE {table} SET ");
+                sb.Append(string.Join(", ", columnValues.Select(x => $"{x.Key} = @{x.Key}")));
+                sb.Append(" ");
 
-            if (Updates.Any() && !string.IsNullOrEmpty(Table))
-            {
-                sb.Append($"UPDATE {Table} SET ");
-                sb.Append(string.Join(", ", Inserts.Select(x => $"SET {x.Key} = @{x.Key}")));
-                return sb.ToString();
+                if (whereOperations.Any())
+                    sb.Append($"{GetWhereOperationSymbol(SimplifyWhereOperation.Where)} ");
 
+                foreach (var where in whereOperations)
+                {
+                    var operationSymbol = GetWhereOperationSymbol(where.Operation);
+                    var parameterName = !string.IsNullOrEmpty(where.ParameterName) ? (where.ParameterName!) : null;
+
+                    if (!string.IsNullOrEmpty(where.LeftTable) && !string.IsNullOrEmpty(where.LeftColumn))
+                    {
+                        var whereTable = where.LeftTable!;
+                        var column = where.LeftColumn!;
+                        sb.Append($"{table}.{column} {operationSymbol} {parameterName} ");
+                    }
+                    else
+                        sb.Append($"{operationSymbol} {parameterName} ");
+                }
+
+                return sb.Append(";").ToString().Replace("  ", " ").TrimEnd();
             }
 
             return string.Empty;
         }
 
-        public Dictionary<string, object> GetParameters()
+        public virtual string GetWhereOperationSymbol(SimplifyWhereOperation operation) => operation switch
         {
-            throw new NotImplementedException();
-        }
+            SimplifyWhereOperation.Where => "WHERE",
+            SimplifyWhereOperation.Or => "OR",
+            SimplifyWhereOperation.And => "AND",
+            SimplifyWhereOperation.Equals => "=",
+            SimplifyWhereOperation.NotEquals => "<>",
+            SimplifyWhereOperation.Greater => ">",
+            SimplifyWhereOperation.GreaterOrEqual => ">=",
+            SimplifyWhereOperation.Lower => "<",
+            SimplifyWhereOperation.LowerOrEqual => "<=",
+            SimplifyWhereOperation.Between => "BETWEEN",
+            _ => throw new ArgumentException("Invalid operation for this method", nameof(operation))
+        };
     }
 }

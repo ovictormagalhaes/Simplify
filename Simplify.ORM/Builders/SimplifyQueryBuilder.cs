@@ -4,25 +4,18 @@ using Simplify.ORM.Interfaces;
 
 namespace Simplify.ORM.Builders
 {
-    public class InsertColumn
-    {
-        public string? Column { get; set; }
-        public string? Parameter { get; set; }
-    }
-
     public abstract partial class SimplifyQueryBuilder : ISimplifyQueryBuilder
     {
         public string Query { get => BuildQuery(); }
-        protected Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
-        protected List<string> Selects { get; set; } = new List<string>();
-        protected List<Tuple<SimplifyJoinOperation, string>> Joins { get; set; } = new List<Tuple<SimplifyJoinOperation, string>>();
-        protected List<WhereOperation> Wheres { get; set; } = new List<WhereOperation>();
-        protected List<Tuple<SimplifyOrderOperation, string>> OrdersBy { get; set; } = new List<Tuple<SimplifyOrderOperation, string>>();
+        protected Dictionary<string, object> Parameters { get; set; } = [];
+        protected List<string> Selects { get; set; } = [];
+        protected List<Tuple<SimplifyJoinOperation, string>> Joins { get; set; } = [];
+        protected List<WhereOperation> Wheres { get; set; } = [];
+        protected List<Tuple<SimplifyOrderOperation, string>> OrdersBy { get; set; } = [];
         protected int? TopValue { get; set; }
         protected int? LimitValue { get; set; }
 
         protected string? InsertTable { get; set; }
-        protected List<InsertColumn> InsertsColumn { get; set; } = new List<InsertColumn>();
 
         public virtual string BuildQuery()
         {
@@ -82,15 +75,6 @@ namespace Simplify.ORM.Builders
 
             if (LimitValue.HasValue)
                 sb.Append($"LIMIT {LimitValue} ");
-
-            if (!string.IsNullOrEmpty(InsertTable) && InsertsColumn.Any())
-            {
-                var formattedTable = FormatTable(InsertTable!);
-                var columns = string.Join(", ", InsertsColumn.Select(c => FormatColumn(c.Column!)));
-                var values = string.Join(", ", InsertsColumn.Select(c => FormatParameterName(c.Parameter!)));
-
-                sb.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2})", formattedTable, columns, values);
-            }
 
             return sb.Append(";").ToString().Replace("  ", " ").TrimEnd();
         }
@@ -200,25 +184,6 @@ namespace Simplify.ORM.Builders
         public ISimplifyQueryBuilder AddOrderBy(string table, string column, SimplifyOrderOperation operation = SimplifyOrderOperation.Asc)
         {
             OrdersBy.Add(new Tuple<SimplifyOrderOperation, string>(operation, $"{FormatTable(table)}.{FormatColumn(column)}"));
-            return this;
-        }
-
-        public ISimplifyQueryBuilder AddInsert(string table, Dictionary<string, object> columns)
-        {
-            InsertTable = table;
-
-            foreach (var column in columns)
-            {
-                var parameter = GetParameterName(column.Key);
-                var item = new InsertColumn
-                {
-                    Column = column.Key,
-                    Parameter = parameter,
-                };
-                AddParameter(parameter, column.Value);
-                InsertsColumn.Add(item);
-            }
-
             return this;
         }
 

@@ -4,20 +4,17 @@ namespace Simplify.ORM.Builders
 {
     public class SimplifyMySQLQueryBuilder : SimplifyQueryBuilder
     {
-        override
-        public string FormatTable(string table)
+        public override string FormatTable(string table)
         {
             return $"`{table}`";
         }
 
-        override
-        public string FormatColumn(string column)
+        public override string FormatColumn(string column)
         {
             return $"`{column}`";
         }
 
-        override
-        public ISimplifyQueryBuilder AddTop(int top)
+        public override ISimplifyQueryBuilder AddTop(int top)
         {
             return this;
         }
