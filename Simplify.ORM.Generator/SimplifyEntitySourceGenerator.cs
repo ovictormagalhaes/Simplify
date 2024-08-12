@@ -1,9 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using Simplify.ORM.Enumerations;
+using Simplify.ORM.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -65,18 +65,29 @@ namespace Simplify.ORM.Generator
                 .OfType<MethodDeclarationSyntax>()
                 .ToList();
 
+            var attributes = classDeclaration.AttributeLists.ToList();
+
             return new ClassInfo
             {
                 NamespaceName = namespaceName,
                 ClassName = className,
                 Properties = properties,
-                Methods = methods
+                Methods = methods,
+                Attributes = attributes
             };
         }
 
-        private static string GenerateSource(ClassInfo classInfo)
+        private static string GenerateSource(ClassInfo? classInfo)
         {
+            if (classInfo is null)
+                return string.Empty;
+
             var sb = new StringBuilder();
+
+            var attributeTableName = classInfo.GetAttributeValue("Table", "Name")?.ToString() ?? null;
+            var attributeTableColumnsNamingConvention = classInfo.GetAttributeValue("Table", "ColumnsNamingConvention")?.ToString() ?? null;
+
+            Enum.TryParse(attributeTableColumnsNamingConvention, ignoreCase: true, out NamingConvention columnNamingConvention);
 
             sb.Append(
                 $"""
@@ -86,40 +97,52 @@ namespace Simplify.ORM.Generator
                 namespace {classInfo.NamespaceName}
                 """);
             sb.AppendLine("{");
-            sb.AppendLine($"    public partial class {classInfo.ClassName}");// : SimplifyEntity");
+            sb.AppendLine($"    public partial class {classInfo.ClassName}");
             sb.AppendLine("    {");
 
-            if (!classInfo.Methods.Any(m => m.Identifier.Text == "GetColumnValues"))
+            if (!classInfo.HasMethod("GetColumnValues"))
             {
                 sb.AppendLine("        public override Dictionary<string, object> GetColumnValues()");
                 sb.AppendLine("        {");
                 sb.AppendLine("            var columnValues = new Dictionary<string, object>();");
 
+
                 foreach (var property in classInfo.Properties)
                 {
-                    var propertyName = property.Identifier.Text;
-                    sb.AppendLine($"            columnValues.Add(\"{propertyName}\", {propertyName});");
+                    var propertyValue = property.Identifier.Text;
+
+                    var propertyName = columnNamingConvention switch {
+                        NamingConvention.PascalCase => property.Identifier.Text.ToPascalCase(),
+                        NamingConvention.CamelCase => property.Identifier.Text.ToCamelCase(),
+                        NamingConvention.SnakeCase => property.Identifier.Text.ToSnakeCase(),
+                        _ => property.Identifier.Text
+                    };
+
+                    sb.AppendLine($"            columnValues.Add(\"{propertyName}\", {propertyValue});");
                 }
 
                 sb.AppendLine("            return columnValues;");
                 sb.AppendLine("        }");
             }
 
-            if (!classInfo.Methods.Any(m => m.Identifier.Text == "GetTableName"))
-                sb.AppendLine($"        public override string GetTableName() => nameof({classInfo.ClassName});");
+            if (!classInfo.HasMethod("GetTableName"))
+            {
+                if (!string.IsNullOrWhiteSpace(attributeTableName))
+                {
+                    sb.AppendLine($"        public override string GetTableName() => \"{attributeTableName}\";");
+                    sb.AppendLine($"        public new static string TableName => \"{attributeTableName}\";");
+                }
+                else
+                {
+                    sb.AppendLine($"        public override string GetTableName() => nameof({classInfo.ClassName});");
+                    sb.AppendLine($"        public new string TableName => nameof({classInfo.ClassName});");
+                }
+            }
 
             sb.AppendLine("    }");
             sb.AppendLine("}");
 
             return sb.ToString();
-        }
-
-        private record ClassInfo
-        {
-            public string NamespaceName { get; set; }
-            public string ClassName { get; set; }
-            public List<PropertyDeclarationSyntax> Properties { get; set; }
-            public List<MethodDeclarationSyntax> Methods { get; set; }
         }
     }
 }

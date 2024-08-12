@@ -6,35 +6,39 @@ namespace Simplify.ORM.Builders
 {
     public class SimplifyCommandBuilder : ISimplifyCommandBuilder
     {
-        public string BuildInsertQuery(string table, Dictionary<string, object> columnValues)
+        protected Dictionary<string, object> Parameters { get; set; } = [];
+
+        protected string Table { get; set; } = string.Empty;
+        protected Dictionary<string, object> InsertValues { get; set; } = [];
+        protected Dictionary<string, object> UpdateValues { get; set; } = [];
+
+        protected List<WhereOperation> UpdateWheres = [];
+
+        public Dictionary<string, object> GetParameters() => Parameters;
+
+        public virtual string BuildQuery()
         {
             var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(table) && columnValues.Any())
+            if (!string.IsNullOrEmpty(Table) && InsertValues.Any())
             {
-                sb.Append($"INSERT INTO {table} (");
-                sb.Append(string.Join(", ", columnValues.Select(x => x.Key)));
+                sb.Append($"INSERT INTO {Table} (");
+                sb.Append(string.Join(", ", InsertValues.Select(x => x.Key)));
                 sb.Append(") VALUES (");
-                sb.Append(string.Join(", ", columnValues.Select(x => $"@{x.Key}")));
-                sb.Append(");");
-                return sb.ToString();
+                sb.Append(string.Join(", ", InsertValues.Select(x => $"@{x.Key}")));
+                sb.Append(")");
+                return sb.Append(";").ToString().Replace("  ", " ").TrimEnd();
             }
 
-            return string.Empty;
-        }
-
-        public string BuildUpdateQuery(string table, Dictionary<string, object> columnValues, List<WhereOperation> whereOperations)
-        {
-            var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(table) && columnValues.Any())
+            if (!string.IsNullOrEmpty(Table) && UpdateValues.Any())
             {
-                sb.Append($"UPDATE {table} SET ");
-                sb.Append(string.Join(", ", columnValues.Select(x => $"{x.Key} = @{x.Key}")));
+                sb.Append($"UPDATE {Table} SET ");
+                sb.Append(string.Join(", ", UpdateValues.Select(x => $"{x.Key} = @{x.Key}")));
                 sb.Append(" ");
 
-                if (whereOperations.Any())
+                if (UpdateWheres.Any())
                     sb.Append($"{GetWhereOperationSymbol(SimplifyWhereOperation.Where)} ");
 
-                foreach (var where in whereOperations)
+                foreach (var where in UpdateWheres)
                 {
                     var operationSymbol = GetWhereOperationSymbol(where.Operation);
                     var parameterName = !string.IsNullOrEmpty(where.ParameterName) ? (where.ParameterName!) : null;
@@ -43,16 +47,38 @@ namespace Simplify.ORM.Builders
                     {
                         var whereTable = where.LeftTable!;
                         var column = where.LeftColumn!;
-                        sb.Append($"{table}.{column} {operationSymbol} {parameterName} ");
+                        sb.Append($"{Table}.{column} {operationSymbol} {parameterName} ");
                     }
                     else
                         sb.Append($"{operationSymbol} {parameterName} ");
                 }
-
                 return sb.Append(";").ToString().Replace("  ", " ").TrimEnd();
             }
-
+            
             return string.Empty;
+        }
+
+        public ISimplifyCommandBuilder AddInsert(ISimplifyEntity entity) 
+            => AddInsert(entity.GetTableName(), entity.GetColumnValues());
+
+        public ISimplifyCommandBuilder AddInsert(string table, Dictionary<string, object> columnValues)
+        {
+            Table = table;
+            Parameters = columnValues;
+            InsertValues = columnValues;
+            return this;
+        }
+
+        public ISimplifyCommandBuilder AddUpdate(ISimplifyEntity entity, List<WhereOperation> whereOperations)
+            => AddUpdate(entity.GetTableName(), entity.GetColumnValues(), whereOperations);
+
+        public ISimplifyCommandBuilder AddUpdate(string table, Dictionary<string, object> columnValues, List<WhereOperation> whereOperations)
+        {
+            Table = table;
+            Parameters = columnValues;
+            UpdateValues = columnValues;
+            UpdateWheres = whereOperations;
+            return this;
         }
 
         public virtual string GetWhereOperationSymbol(SimplifyWhereOperation operation) => operation switch

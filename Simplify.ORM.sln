@@ -10,7 +10,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simplify.ORM.Test", "Simpli
 		{33C63650-15D4-421B-96DA-C51EAE201DD1} = {33C63650-15D4-421B-96DA-C51EAE201DD1}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simplify.ORM.Generator", "Simplify.ORM.Generator\Simplify.ORM.Generator.csproj", "{D4F55239-8239-429C-9F5A-1E5846D481AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simplify.ORM.Generator", "Simplify.ORM.Generator\Simplify.ORM.Generator.csproj", "{D4F55239-8239-429C-9F5A-1E5846D481AF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{33C63650-15D4-421B-96DA-C51EAE201DD1} = {33C63650-15D4-421B-96DA-C51EAE201DD1}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simplify.Examples.API", "Simplify.Examples.API\Simplify.Examples.API.csproj", "{70942A92-337F-491A-A052-531CBC03D0BB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{33C63650-15D4-421B-96DA-C51EAE201DD1} = {33C63650-15D4-421B-96DA-C51EAE201DD1}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +38,10 @@ Global
 		{D4F55239-8239-429C-9F5A-1E5846D481AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4F55239-8239-429C-9F5A-1E5846D481AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4F55239-8239-429C-9F5A-1E5846D481AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70942A92-337F-491A-A052-531CBC03D0BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70942A92-337F-491A-A052-531CBC03D0BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70942A92-337F-491A-A052-531CBC03D0BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70942A92-337F-491A-A052-531CBC03D0BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

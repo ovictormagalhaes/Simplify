@@ -6,7 +6,6 @@ namespace Simplify.ORM.Builders
 {
     public abstract partial class SimplifyQueryBuilder : ISimplifyQueryBuilder
     {
-        public string Query { get => BuildQuery(); }
         protected Dictionary<string, object> Parameters { get; set; } = [];
         protected List<string> Selects { get; set; } = [];
         protected List<Tuple<SimplifyJoinOperation, string>> Joins { get; set; } = [];
@@ -238,25 +237,19 @@ namespace Simplify.ORM.Builders
 
         #region Select
 
-        public ISimplifyQueryBuilder SelectFields(string tableName, List<string> columns)
+        public ISimplifyQueryBuilder SelectFields(string table, List<string> columns)
         {
-            var selects = columns.Select(c => new Tuple<string, string>(tableName, c)).ToList();
+            var selects = columns.Select(c => new Tuple<string, string>(table, c)).ToList();
 
             return AddSelect(selects);
         }
 
-        public ISimplifyQueryBuilder SelectAllFields(string tableName)
-            => AddSelect(tableName, string.Empty);
+        public ISimplifyQueryBuilder SelectAllFields(string table)
+            => AddSelect(table, string.Empty);
 
-        public ISimplifyQueryBuilder Top(int top)
-        {
-            return AddTop(top);
-        }
+        public ISimplifyQueryBuilder Top(int top) => AddTop(top);
 
-        public ISimplifyQueryBuilder Limit(int limit)
-        {
-            return AddLimit(limit);
-        }
+        public ISimplifyQueryBuilder Limit(int limit) => AddLimit(limit);
 
         #endregion
 

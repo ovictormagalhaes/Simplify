@@ -4,39 +4,15 @@ using System.Data;
 
 namespace Simplify.ORM
 {
-    public interface ISimplifyCommand
+    public class SimplifyCommand(IDbConnection connection) : ISimplifyCommand
     {
-        ISimplifyCommand Save(ISimplifyEntity entity);
-        Task Execute();
-        Task ExecuteAsync();
-    }
+        private readonly IDbConnection _connection = connection;
 
-    public class SimplifyCommand : ISimplifyCommand
-    {
-        private readonly IDbConnection _connection;
-        private readonly ISimplifyQueryBuilder _queryBuilder;
-        private readonly ISimplifyCommandBuilder _commandBuilder;
-        private List<ISimplifyEntity> ToSave { get; } = new List<ISimplifyEntity>();
-
-        public SimplifyCommand(IDbConnection connection, ISimplifyQueryBuilder queryBuilder, ISimplifyCommandBuilder commandBuilder)
-        {
-            _connection = connection;
-            _queryBuilder = queryBuilder;
-            _commandBuilder = commandBuilder;
-        }
-
-        public ISimplifyCommand Save(ISimplifyEntity entity)
-        {
-            ToSave.Add(entity);
-            return this;
-        }
-
-        public Task Execute()
+        public Task Execute(ISimplifyCommandBuilder command)
         {
             using (var transaction = _connection.BeginTransaction())
             {
-                var query = _queryBuilder.BuildQuery();
-                ToSave.ForEach(entity => _connection.Execute("", entity, transaction));
+                _connection.Execute(command.BuildQuery(), command.GetParameters());
 
                 transaction.Commit();
             }
@@ -44,16 +20,34 @@ namespace Simplify.ORM
             return Task.CompletedTask;
         }
 
-        public Task ExecuteAsync()
+        public Task Execute(IEnumerable<ISimplifyCommandBuilder> commands)
         {
             using (var transaction = _connection.BeginTransaction())
             {
-                ToSave.ForEach(async entity
-                    => await _connection.ExecuteAsync("", entity, transaction));
+                foreach (var command in commands)
+                    _connection.Execute(command.BuildQuery(), command.GetParameters());
 
                 transaction.Commit();
             }
+
             return Task.CompletedTask;
+        }
+
+        public async Task ExecuteAsync(ISimplifyCommandBuilder command)
+        {
+            using var transaction = _connection.BeginTransaction();
+                await _connection.ExecuteAsync(command.BuildQuery(), command.GetParameters());
+
+            transaction.Commit();
+        }
+
+        public async Task ExecuteAsync(IEnumerable<ISimplifyCommandBuilder> commands)
+        {
+            using var transaction = _connection.BeginTransaction();
+            foreach (var command in commands)
+                await _connection.ExecuteAsync(command.BuildQuery(), command.GetParameters());
+
+            transaction.Commit();
         }
 
         public IEnumerable<T> Query<T>(ISimplifyQueryBuilder query)

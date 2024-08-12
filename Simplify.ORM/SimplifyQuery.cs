@@ -4,29 +4,20 @@ using System.Data;
 
 namespace Simplify.ORM
 {
-    public class SimplifyQuery : ISimplifyQuery
+    public class SimplifyQuery(IDbConnection connection) : ISimplifyQuery
     {
-        private readonly IDbConnection _connection;
-        private readonly ISimplifyQueryBuilder _queryBuilder;
+        private readonly IDbConnection _connection = connection;
 
-        public SimplifyQuery(IDbConnection connection, ISimplifyQueryBuilder queryBuilder)
-        {
-            _connection = connection;
-            _queryBuilder = queryBuilder;
-        }
-
-        public IEnumerable<T> Query<T>(ISimplifyQueryBuilder query)
+        public IEnumerable<T> Query<T>(ISimplifyQueryBuilder query) where T : ISimplifyEntity
             => _connection.Query<T>(query.BuildQuery(), query.GetParameters());
 
-        public async Task<IEnumerable<T>> QueryAsync<T>(ISimplifyQueryBuilder query)
+        public async Task<IEnumerable<T>> QueryAsync<T>(ISimplifyQueryBuilder query) where T : ISimplifyEntity
             => await _connection.QueryAsync<T>(query.BuildQuery(), query.GetParameters());
 
-        public Task<IEnumerable<T>> FirstOrDefault<T>(string table, string column) where T : ISimplifyEntity
-        {
-            _queryBuilder.BuildQuery();
-
-            throw new NotImplementedException();
-        }
-
+        public T FirstOrDefault<T>(ISimplifyQueryBuilder query) where T : ISimplifyEntity
+            => _connection.QueryFirstOrDefault<T>(query.BuildQuery(), query.GetParameters());
+        
+        public async Task<T> FirstOrDefaultAsync<T>(ISimplifyQueryBuilder query) where T : ISimplifyEntity
+            => await _connection.QueryFirstOrDefaultAsync<T>(query.BuildQuery(), query.GetParameters());
     }
 }
