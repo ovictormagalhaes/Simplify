@@ -3,7 +3,8 @@
     public interface ISimplifyEntity
     {
         string GetTableName();
+        public string? GetColumnName(string property);
+        IEnumerable<SimplifyEntityProperty> GetProperties();
         Dictionary<string, object> GetColumnValues();
-        IEnumerable<string> GetColumns();
     }
 }

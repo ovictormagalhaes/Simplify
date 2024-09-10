@@ -1,10 +1,5 @@
 ﻿using Simplify.ORM.Builders;
 using Simplify.ORM.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Simplify.ORM.Test.Builders
@@ -19,7 +14,7 @@ namespace Simplify.ORM.Test.Builders
                 { "Username", "Victor" },
                 { "Password", "secret" }
             };
-            var query = new SimplifyCommandBuilder()
+            var query = default(AbstractSimplifyCommandBuilder)!
                 .AddInsert(table, columnValues)
                 .BuildQuery();
 
@@ -39,7 +34,7 @@ namespace Simplify.ORM.Test.Builders
             var whereOperations = new List<WhereOperation>() {
                 new(SimplifyWhereOperation.Equals, table, "Id", "@Id", 1)
             };
-            var query = new SimplifyCommandBuilder()
+            var query = default(AbstractSimplifyCommandBuilder)!
                 .AddUpdate(table, columnValues, whereOperations)
                 .BuildQuery();
 

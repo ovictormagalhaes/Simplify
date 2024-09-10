@@ -1,12 +1,13 @@
 ﻿using System.Text;
 using Simplify.ORM.Enumerations;
 using Simplify.ORM.Interfaces;
+using Simplify.ORM.Utils;
 
 namespace Simplify.ORM.Builders
 {
-    public abstract partial class SimplifyQueryBuilder : ISimplifyQueryBuilder
+    public abstract class AbstractSimplifyQueryBuilder : ISimplifyQueryBuilder
     {
-        protected Dictionary<string, object> Parameters { get; set; } = [];
+        protected Dictionary<string, object?> Parameters { get; set; } = [];
         protected List<string> Selects { get; set; } = [];
         protected List<Tuple<SimplifyJoinOperation, string>> Joins { get; set; } = [];
         protected List<WhereOperation> Wheres { get; set; } = [];
@@ -78,7 +79,14 @@ namespace Simplify.ORM.Builders
             return sb.Append(";").ToString().Replace("  ", " ").TrimEnd();
         }
 
-        public Dictionary<string, object> GetParameters() => Parameters;
+        public Dictionary<string, object?> GetParameters() => Parameters;
+
+        public string TableName<T>() where T : SimplifyEntity
+                    => SimplifyEntityHelper.TableName<T>();
+
+        public string ColumnName<T>(string property) where T : SimplifyEntity
+            => SimplifyEntityHelper.ColumnName<T>(property);
+
 
         #region Format
 
@@ -94,7 +102,7 @@ namespace Simplify.ORM.Builders
 
         #region Add
 
-        public virtual ISimplifyQueryBuilder AddParameter(string name, object value)
+        public virtual ISimplifyQueryBuilder AddParameter(string name, object? value)
         {
             Parameters.Add(name, value);
             return this;
@@ -154,7 +162,7 @@ namespace Simplify.ORM.Builders
             return this;
         }
 
-        public ISimplifyQueryBuilder AddWhere(SimplifyWhereOperation operation, string table, string column, object value)
+        public ISimplifyQueryBuilder AddWhere(SimplifyWhereOperation operation, string table, string column, object? value)
         {
             var parameterName = GetParameterName(column);
 
@@ -281,14 +289,15 @@ namespace Simplify.ORM.Builders
 
         #region Where
 
-        private ISimplifyQueryBuilder WhereBase(SimplifyWhereOperation operation, string tableName, string column, object value, bool conditional)
+        private ISimplifyQueryBuilder WhereBase(SimplifyWhereOperation operation, string tableName, string column, object? value, bool conditional)
         {
-            if (!conditional) { return this; }
+            if (!conditional) 
+                return this; 
 
             return AddWhere(operation, tableName, column, value);
         }
 
-        public ISimplifyQueryBuilder WhereEquals(string tableName, string column, object value, bool conditional = true)
+        public ISimplifyQueryBuilder WhereEquals(string tableName, string column, object? value, bool conditional = true)
             => WhereBase(SimplifyWhereOperation.Equals, tableName, column, value, conditional);
 
         public ISimplifyQueryBuilder WhereNotEquals(string tableName, string column, object value, bool conditional = true)
@@ -382,6 +391,11 @@ namespace Simplify.ORM.Builders
         public ISimplifyQueryBuilder OrderBy(string table, string column, SimplifyOrderOperation operation = SimplifyOrderOperation.Desc)
         {
             return AddOrderBy(table, column, operation);
+        }
+
+        public ISimplifyQueryBuilder WhereIn(string table, string column, IEnumerable<object> value, bool conditional = true)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

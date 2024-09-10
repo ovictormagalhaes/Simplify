@@ -53,7 +53,12 @@ namespace Simplify.ORM.Test
             };
         }
 
-        public new static string TableName => "Custom";
+        public override IEnumerable<SimplifyEntityProperty> GetProperties()
+        {
+            return [
+                new ("Custom", "Custom", "Value")
+            ]; 
+        }
     }
 
     [Table(Name = "Custom2")]
@@ -65,20 +70,152 @@ namespace Simplify.ORM.Test
                 { "Custom2", "Value2" },
             };
         }
+
+        public override IEnumerable<SimplifyEntityProperty> GetProperties()
+        {
+            return [ new ("Custom2", "Custom2", "Value") ];
+        }
     }
 
 
     public class SimplifyEntityTest
     {
 
-        #region GetColumnValues
+        #region GetProperties
+
+        [Fact]
+        public void GetProperties_ExampleWithoutAttribute()
+        {
+            var user = new ExampleWithoutAttribute
+            {
+                UserId = 1,
+                Username = "Test",
+                Password = "1234",
+                CreatedAt = new DateTime(2024, 7, 1),
+            };
+
+            var columnValues = user.GetProperties();
+
+            var expectedProperties = new List<SimplifyEntityProperty>
+            {
+                new (nameof(user.UserId), nameof(user.UserId), user.UserId),
+                new (nameof(user.Username), nameof(user.Username), user.Username),
+                new (nameof(user.Password),nameof(user.Password), user.Password),
+                new (nameof(user.CreatedAt), nameof(user.CreatedAt), user.CreatedAt)
+            };
+
+            Assert.Equal(expectedProperties, columnValues);
+        }
+
+        [Fact]
+        public void GetProperties_ExampleTablePascalCase()
+        {
+            var user = new ExampleTablePascalCaseCase
+            {
+                UserId = 1,
+                Username = "Test",
+                Password = "1234",
+                CreatedAt = new DateTime(2024, 7, 1),
+            };
+
+            var columnValues = user.GetProperties();
+
+            var expectedProperties = new List<SimplifyEntityProperty>
+            {
+                new (nameof(user.UserId), nameof(user.UserId).ToPascalCase(), user.UserId),
+                new (nameof(user.Username), nameof(user.Username).ToPascalCase(), user.Username),
+                new (nameof(user.Password), nameof(user.Password).ToPascalCase(), user.Password),
+                new (nameof(user.CreatedAt), nameof(user.CreatedAt).ToPascalCase(), user.CreatedAt)
+            };
+
+            Assert.Equal(expectedProperties, columnValues);
+        }
+
+        [Fact]
+        public void GetProperties_ExampleTableCamelCase()
+        {
+            var user = new ExampleTableCamelCaseCase
+            {
+                UserId = 1,
+                Username = "Test",
+                Password = "1234",
+                CreatedAt = new DateTime(2024, 7, 1),
+            };
+
+            var columnValues = user.GetProperties();
+
+            var expectedProperties = new List<SimplifyEntityProperty>
+            {
+                new (nameof(user.UserId), nameof(user.UserId).ToCamelCase(), user.UserId),
+                new (nameof(user.Username), nameof(user.Username).ToCamelCase(), user.Username),
+                new (nameof(user.Password), nameof(user.Password).ToCamelCase(), user.Password),
+                new (nameof(user.CreatedAt), nameof(user.CreatedAt).ToCamelCase(), user.CreatedAt)
+            };
+
+            Assert.Equal(expectedProperties, columnValues);
+        }
+
+        [Fact]
+        public void GetProperties_ExampleTableSnakeCase()
+        {
+            var user = new ExampleTableSnakeCase
+            {
+                UserId = 1,
+                Username = "Test",
+                Password = "1234",
+                CreatedAt = new DateTime(2024, 7, 1),
+            };
+
+            var columnValues = user.GetProperties();
+
+            var expectedProperties = new List<SimplifyEntityProperty>
+            {
+                new (nameof(user.UserId), nameof(user.UserId).ToSnakeCase(), user.UserId),
+                new (nameof(user.Username), nameof(user.Username).ToSnakeCase(), user.Username),
+                new (nameof(user.Password), nameof(user.Password).ToSnakeCase(), user.Password),
+                new (nameof(user.CreatedAt), nameof(user.CreatedAt).ToSnakeCase(), user.CreatedAt)
+            };
+
+            Assert.Equal(expectedProperties, columnValues);
+        }
+
+        [Fact]
+        public void GetProperties_ShouldReturn_CustomValue()
+        {
+            var user = new UserCustomMethods();
+
+            var columnValues = user.GetProperties();
+
+            var expectedProperties = new List<SimplifyEntityProperty>
+            {
+                new ("Custom", "Custom", "Value"),
+            };
+            Assert.Equal(expectedProperties, columnValues);
+        }
+
+        [Fact]
+        public void GetProperties_ShouldReturn_CustomValue2()
+        {
+            var user = new UserCustomMethods2();
+
+            var columnValues = user.GetProperties();
+
+            var expectedProperties = new List<SimplifyEntityProperty>
+            {
+                new ("Custom2", "Custom2", "Value"),
+            };
+            Assert.Equal(expectedProperties, columnValues);
+        }
 
         #endregion
+
+        #region GetColumnValues
+
         [Fact]
         public void GetColumnValues_ExampleWithoutAttribute()
         {
-            var user = new ExampleWithoutAttribute 
-            { 
+            var user = new ExampleWithoutAttribute
+            {
                 UserId = 1,
                 Username = "Test",
                 Password = "1234",
@@ -159,6 +296,7 @@ namespace Simplify.ORM.Test
 
             var columnValues = user.GetColumnValues();
 
+
             var expectedColumnValues = new Dictionary<string, object>
             {
                 { nameof(user.UserId).ToSnakeCase(), user.UserId },
@@ -181,7 +319,6 @@ namespace Simplify.ORM.Test
             {
                 { "Custom", "Value" },
             };
-
             Assert.Equal(expectedColumnValues, columnValues);
         }
 
@@ -196,9 +333,9 @@ namespace Simplify.ORM.Test
             {
                 { "Custom2", "Value2" },
             };
-
             Assert.Equal(expectedColumnValues, columnValues);
         }
+        #endregion
 
         [Fact]
         public void GetTableName_ShouldReturn_DefaultValue()

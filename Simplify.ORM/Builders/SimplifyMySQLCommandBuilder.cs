@@ -1,6 +1,6 @@
 ﻿namespace Simplify.ORM.Builders
 {
-    public class SimplifyMySQLCommandBuilder : SimplifyCommandBuilder
+    public sealed class SimplifyMySQLCommandBuilder : AbstractSimplifyCommandBuilder
     {
     }
 }

@@ -11,15 +11,20 @@ namespace Simplify.Examples.API.Controllers
         private readonly IUserQuery _userQuery = userQuery;
 
         [HttpGet]
-        public IActionResult GetByFilter([FromQuery] GetUserFilterRequest request)
+        public IActionResult GetPagedByFilter([FromQuery] GetUserFilterRequest request)
         {
             return Ok();
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetById([FromRoute] int id)
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            return Ok();
+            var user = await _userQuery.FirstOrDefaultByIdAsync(id);
+
+            if (user == null)
+                return NotFound($"Not found user with id {id}");
+
+            return Ok(user);
         }
     }
 }

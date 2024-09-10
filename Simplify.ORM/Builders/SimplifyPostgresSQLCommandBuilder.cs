@@ -1,6 +1,6 @@
 ﻿namespace Simplify.ORM.Builders
 {
-    public class SimplifyPostgresSQLCommandBuilder : SimplifyCommandBuilder
+    public sealed class SimplifyPostgresSQLCommandBuilder : AbstractSimplifyCommandBuilder
     {
     }
 }

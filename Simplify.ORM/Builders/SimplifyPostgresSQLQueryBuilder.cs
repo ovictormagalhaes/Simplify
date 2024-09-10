@@ -2,7 +2,7 @@
 
 namespace Simplify.ORM.Builders
 {
-    public class SimplifyPostgresSQLQueryBuilder : SimplifyQueryBuilder
+    public sealed class SimplifyPostgresSQLQueryBuilder : AbstractSimplifyQueryBuilder
     {        
         public override string FormatTable(string table)
         {

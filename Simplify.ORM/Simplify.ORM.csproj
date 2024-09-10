@@ -7,8 +7,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-      <!-- Won't work -->
-      <!--<IsRoslynComponent>true</IsRoslynComponent>-->
   </PropertyGroup>
 
   <ItemGroup>

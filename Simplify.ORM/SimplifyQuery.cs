@@ -1,23 +1,19 @@
 ﻿using Dapper;
 using Simplify.ORM.Interfaces;
-using System.Data;
+using Simplify.ORM.Utils;
 
 namespace Simplify.ORM
 {
-    public class SimplifyQuery(IDbConnection connection) : ISimplifyQuery
+    public class SimplifyQuery(ISimplifyQueryBuilder queryBuilder) : ISimplifyQuery
     {
-        private readonly IDbConnection _connection = connection;
+        public readonly ISimplifyQueryBuilder QueryBuilder = queryBuilder ?? throw new ArgumentNullException(nameof(queryBuilder));
 
-        public IEnumerable<T> Query<T>(ISimplifyQueryBuilder query) where T : ISimplifyEntity
-            => _connection.Query<T>(query.BuildQuery(), query.GetParameters());
+        public string TableName<T>() where T : SimplifyEntity
+            => SimplifyEntityHelper.TableName<T>();
 
-        public async Task<IEnumerable<T>> QueryAsync<T>(ISimplifyQueryBuilder query) where T : ISimplifyEntity
-            => await _connection.QueryAsync<T>(query.BuildQuery(), query.GetParameters());
+        public string ColumnName<T>(string property) where T : SimplifyEntity 
+            => SimplifyEntityHelper.ColumnName<T>(property);
 
-        public T FirstOrDefault<T>(ISimplifyQueryBuilder query) where T : ISimplifyEntity
-            => _connection.QueryFirstOrDefault<T>(query.BuildQuery(), query.GetParameters());
-        
-        public async Task<T> FirstOrDefaultAsync<T>(ISimplifyQueryBuilder query) where T : ISimplifyEntity
-            => await _connection.QueryFirstOrDefaultAsync<T>(query.BuildQuery(), query.GetParameters());
+        public ISimplifyQueryBuilder GetBuilder() => QueryBuilder;
     }
 }

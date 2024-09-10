@@ -2,11 +2,25 @@
 
 namespace Simplify.ORM
 {
-    public abstract partial class SimplifyEntity : ISimplifyEntity
+    public record SimplifyEntityProperty
+    {
+        public SimplifyEntityProperty(string? propertyName, string? columnName, object? value)
+        {
+            PropertyName = propertyName;
+            ColumnName = columnName;
+            Value = value;
+        }
+
+        public string? PropertyName { get; set; }
+        public string? ColumnName { get; set; }
+        public object? Value { get; set; }
+    }
+
+    public abstract class SimplifyEntity : ISimplifyEntity
     {
         public virtual string GetTableName() => GetType().Name;
+        public string? GetColumnName(string property) => GetProperties().FirstOrDefault(x => x.PropertyName == property)?.PropertyName;
+        public virtual IEnumerable<SimplifyEntityProperty> GetProperties() => [];
         public virtual Dictionary<string, object> GetColumnValues() => [];
-        public virtual IEnumerable<string> GetColumns() => GetColumnValues().Select(x => x.Key);
-        public static string TableName => nameof(SimplifyEntity);
     }
 }

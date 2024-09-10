@@ -77,7 +77,7 @@ namespace Simplify.ORM.Generator
             };
         }
 
-        private static string GenerateSource(ClassInfo? classInfo)
+        private static string GenerateSource(ClassInfo classInfo)
         {
             if (classInfo is null)
                 return string.Empty;
@@ -109,16 +109,43 @@ namespace Simplify.ORM.Generator
 
                 foreach (var property in classInfo.Properties)
                 {
-                    var propertyValue = property.Identifier.Text;
+                    var propertyIdentifier = property.Identifier.Text;
 
-                    var propertyName = columnNamingConvention switch {
+                    var columnName = columnNamingConvention switch
+                    {
                         NamingConvention.PascalCase => property.Identifier.Text.ToPascalCase(),
                         NamingConvention.CamelCase => property.Identifier.Text.ToCamelCase(),
                         NamingConvention.SnakeCase => property.Identifier.Text.ToSnakeCase(),
                         _ => property.Identifier.Text
                     };
 
-                    sb.AppendLine($"            columnValues.Add(\"{propertyName}\", {propertyValue});");
+                    sb.AppendLine($"            columnValues.Add(\"{columnName}\", {propertyIdentifier});");
+                }
+
+                sb.AppendLine("            return columnValues;");
+                sb.AppendLine("        }");
+            }
+
+            if (!classInfo.HasMethod("GetProperties"))
+            {
+                sb.AppendLine("        public override IEnumerable<SimplifyEntityProperty> GetProperties()");
+                sb.AppendLine("        {");
+                sb.AppendLine("            var columnValues = new List<SimplifyEntityProperty>();");
+
+
+                foreach (var property in classInfo.Properties)
+                {
+                    var propertyIdentifier = property.Identifier.Text;
+
+                    var columnName = columnNamingConvention switch
+                    {
+                        NamingConvention.PascalCase => string.Copy(property.Identifier.Text).ToPascalCase(),
+                        NamingConvention.CamelCase => string.Copy(property.Identifier.Text).ToCamelCase(),
+                        NamingConvention.SnakeCase => string.Copy(property.Identifier.Text).ToSnakeCase(),
+                        _ => property.Identifier.Text
+                    };
+
+                    sb.AppendLine($"            columnValues.Add(new SimplifyEntityProperty(\"{propertyIdentifier}\", \"{columnName}\", {propertyIdentifier}));");
                 }
 
                 sb.AppendLine("            return columnValues;");
@@ -128,15 +155,17 @@ namespace Simplify.ORM.Generator
             if (!classInfo.HasMethod("GetTableName"))
             {
                 if (!string.IsNullOrWhiteSpace(attributeTableName))
-                {
                     sb.AppendLine($"        public override string GetTableName() => \"{attributeTableName}\";");
-                    sb.AppendLine($"        public new static string TableName => \"{attributeTableName}\";");
-                }
                 else
-                {
                     sb.AppendLine($"        public override string GetTableName() => nameof({classInfo.ClassName});");
-                    sb.AppendLine($"        public new string TableName => nameof({classInfo.ClassName});");
-                }
+            }
+
+            if (!classInfo.HasMethod("TableName"))
+            {
+                if (!string.IsNullOrWhiteSpace(attributeTableName))
+                    sb.AppendLine($"        public static string TableName => \"{attributeTableName}\";");
+                else
+                    sb.AppendLine($"        public string TableName => nameof({classInfo.ClassName});");
             }
 
             sb.AppendLine("    }");

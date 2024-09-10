@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Simplify.ORM.Builders
 {
-    public class SimplifyCommandBuilder : ISimplifyCommandBuilder
+    public abstract class AbstractSimplifyCommandBuilder : ISimplifyCommandBuilder
     {
         protected Dictionary<string, object> Parameters { get; set; } = [];
 
