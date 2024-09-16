@@ -6,10 +6,19 @@ using System.Reflection;
 
 namespace Simplify.ORM
 {
-    public class SimplifyExecutor(IDbConnection connection, ISimplifyQueryBuilder queryBuilder) : ISimplifyExecutor
+    public class SimplifyExecutor : ISimplifyExecutor
     {
-        private readonly IDbConnection _connection = connection;
-        private readonly ISimplifyQueryBuilder _queryBuilder = queryBuilder;
+        private readonly IDbConnection _connection;
+        private readonly ISimplifyQueryBuilder _queryBuilder;
+
+        public SimplifyExecutor(IDbConnection connection, ISimplifyQueryBuilder queryBuilder)
+        {
+            _connection = connection;
+            _queryBuilder = queryBuilder;
+
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
+        }
 
         public Task Execute(ISimplifyCommandBuilder command)
         {

@@ -1,4 +1,5 @@
 ﻿using Simplify.ORM.Interfaces;
+using Simplify.ORM.Utils;
 
 namespace Simplify.ORM
 {
@@ -37,9 +38,8 @@ namespace Simplify.ORM
             await Executor.ExecuteAsync(CommandBuilder.AddUpdateWhereEquals(table, columnValues, column, value));
         }
 
-        public string ColumnName<T>(string property) where T : SimplifyEntity
-        {
-            return QueryBuilder.ColumnName<T>(property);
-        }
+        public string ColumnName<O>(string property) where O : SimplifyEntity => SimplifyEntityHelper.ColumnName<O>(property);
+
+        public string TableName<O>() where O : SimplifyEntity => SimplifyEntityHelper.TableName<O>();
     }
 }
