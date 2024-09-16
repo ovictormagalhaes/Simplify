@@ -32,6 +32,7 @@ namespace Simplify.ORM.Interfaces
 
         ISimplifyQueryBuilder SelectFields(string table, List<string> columns);
         ISimplifyQueryBuilder SelectAllFields(string table);
+        ISimplifyQueryBuilder SelectAllFieldsFrom(string table);
         ISimplifyQueryBuilder Top(int top);
         ISimplifyQueryBuilder Limit(int limit);
         ISimplifyQueryBuilder From(string table, string? alias = null);

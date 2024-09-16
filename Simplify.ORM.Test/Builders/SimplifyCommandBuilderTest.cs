@@ -14,7 +14,7 @@ namespace Simplify.ORM.Test.Builders
                 { "Username", "Victor" },
                 { "Password", "secret" }
             };
-            var query = default(AbstractSimplifyCommandBuilder)!
+            var query = new SimplifyMySQLCommandBuilder()
                 .AddInsert(table, columnValues)
                 .BuildQuery();
 
@@ -34,7 +34,7 @@ namespace Simplify.ORM.Test.Builders
             var whereOperations = new List<WhereOperation>() {
                 new(SimplifyWhereOperation.Equals, table, "Id", "@Id", 1)
             };
-            var query = default(AbstractSimplifyCommandBuilder)!
+            var query = new SimplifyMySQLCommandBuilder()
                 .AddUpdate(table, columnValues, whereOperations)
                 .BuildQuery();
 

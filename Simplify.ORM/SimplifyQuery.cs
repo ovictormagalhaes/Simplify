@@ -1,5 +1,4 @@
-﻿using Dapper;
-using Simplify.ORM.Interfaces;
+﻿using Simplify.ORM.Interfaces;
 using Simplify.ORM.Utils;
 
 namespace Simplify.ORM

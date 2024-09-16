@@ -2,7 +2,7 @@
 
 namespace Simplify.ORM.Interfaces
 {
-    public interface ISimplifyCommand
+    public interface ISimplifyExecutor
     {
         Task Execute(ISimplifyCommandBuilder command);
         Task Execute(IEnumerable<ISimplifyCommandBuilder> commands);

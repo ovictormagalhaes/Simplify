@@ -255,6 +255,13 @@ namespace Simplify.ORM.Builders
         public ISimplifyQueryBuilder SelectAllFields(string table)
             => AddSelect(table, string.Empty);
 
+        public ISimplifyQueryBuilder SelectAllFieldsFrom(string table)
+        {
+            AddSelect(table, string.Empty);
+            AddFrom(table);
+            return this;     
+        }
+
         public ISimplifyQueryBuilder Top(int top) => AddTop(top);
 
         public ISimplifyQueryBuilder Limit(int limit) => AddLimit(limit);

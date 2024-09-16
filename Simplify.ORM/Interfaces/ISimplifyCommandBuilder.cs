@@ -12,6 +12,7 @@ namespace Simplify.ORM.Interfaces
 
         ISimplifyCommandBuilder AddUpdate(ISimplifyEntity entity, List<WhereOperation> whereOperations);
         ISimplifyCommandBuilder AddUpdate(string table, Dictionary<string, object> columnValues, List<WhereOperation> whereOperations);
+        ISimplifyCommandBuilder AddUpdateWhereEquals(string table, Dictionary<string, object> columnValues, string column, object value);
 
         string GetWhereOperationSymbol(SimplifyWhereOperation operation);
     }

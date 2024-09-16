@@ -72,12 +72,27 @@ namespace Simplify.ORM.Builders
         public ISimplifyCommandBuilder AddUpdate(ISimplifyEntity entity, List<WhereOperation> whereOperations)
             => AddUpdate(entity.GetTableName(), entity.GetColumnValues(), whereOperations);
 
+        public ISimplifyCommandBuilder AddUpdateWhereEquals(ISimplifyEntity entity, string column, object value)
+            => AddUpdateWhereEquals(entity.GetTableName(), entity.GetColumnValues(), column, value);
+
+        //AddUpdateWhereEquals
         public ISimplifyCommandBuilder AddUpdate(string table, Dictionary<string, object> columnValues, List<WhereOperation> whereOperations)
         {
             Table = table;
             Parameters = columnValues;
             UpdateValues = columnValues;
             UpdateWheres = whereOperations;
+            return this;
+        }
+
+        public ISimplifyCommandBuilder AddUpdateWhereEquals(string table, Dictionary<string, object> columnValues, string column, object value)
+        {
+            Table = table;
+            Parameters = columnValues;
+            UpdateValues = columnValues;
+            UpdateWheres = new List<WhereOperation>() {
+                new(SimplifyWhereOperation.Equals, table, column, $"@{column}", value)
+            };
             return this;
         }
 
