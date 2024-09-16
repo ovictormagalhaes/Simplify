@@ -14,7 +14,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <AnalysisLevel>none</AnalysisLevel>
     <Authors>Victor Magalhães</Authors>
-    <PackageReleaseNotes>Fix SimplifyRepositoryI</PackageReleaseNotes>
+    <PackageReleaseNotes>Remove GetColumnValues from SourceGenerator</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Copyright>Copyright (c) 2024 Victor Magalhães</Copyright>
     <RepositoryType>git</RepositoryType>

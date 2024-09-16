@@ -100,38 +100,11 @@ namespace Simplify.ORM.Generator
             sb.AppendLine($"    public partial class {classInfo.ClassName}");
             sb.AppendLine("    {");
 
-            if (!classInfo.HasMethod("GetColumnValues"))
-            {
-                sb.AppendLine("        public override Dictionary<string, object> GetColumnValues()");
-                sb.AppendLine("        {");
-                sb.AppendLine("            var columnValues = new Dictionary<string, object>();");
-
-
-                foreach (var property in classInfo.Properties)
-                {
-                    var propertyIdentifier = property.Identifier.Text;
-
-                    var columnName = columnNamingConvention switch
-                    {
-                        NamingConvention.PascalCase => property.Identifier.Text.ToPascalCase(),
-                        NamingConvention.CamelCase => property.Identifier.Text.ToCamelCase(),
-                        NamingConvention.SnakeCase => property.Identifier.Text.ToSnakeCase(),
-                        _ => property.Identifier.Text
-                    };
-
-                    sb.AppendLine($"            columnValues.Add(\"{columnName}\", {propertyIdentifier});");
-                }
-
-                sb.AppendLine("            return columnValues;");
-                sb.AppendLine("        }");
-            }
-
             if (!classInfo.HasMethod("GetProperties"))
             {
                 sb.AppendLine("        public override IEnumerable<SimplifyEntityProperty> GetProperties()");
                 sb.AppendLine("        {");
                 sb.AppendLine("            var columnValues = new List<SimplifyEntityProperty>();");
-
 
                 foreach (var property in classInfo.Properties)
                 {

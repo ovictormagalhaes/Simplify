@@ -46,13 +46,6 @@ namespace Simplify.ORM.Test
     [Table("Custom")]
     public partial class UserCustomMethods : SimplifyEntity
     {
-        public override Dictionary<string, object> GetColumnValues()
-        {
-            return new Dictionary<string, object>() {
-                { "Custom", "Value" },
-            };
-        }
-
         public override IEnumerable<SimplifyEntityProperty> GetProperties()
         {
             return [
@@ -64,12 +57,6 @@ namespace Simplify.ORM.Test
     [Table(Name = "Custom2")]
     public partial class UserCustomMethods2 : SimplifyEntity
     {
-        public override Dictionary<string, object> GetColumnValues()
-        {
-            return new Dictionary<string, object>() {
-                { "Custom2", "Value2" },
-            };
-        }
 
         public override IEnumerable<SimplifyEntityProperty> GetProperties()
         {
@@ -207,134 +194,6 @@ namespace Simplify.ORM.Test
             Assert.Equal(expectedProperties, columnValues);
         }
 
-        #endregion
-
-        #region GetColumnValues
-
-        [Fact]
-        public void GetColumnValues_ExampleWithoutAttribute()
-        {
-            var user = new ExampleWithoutAttribute
-            {
-                UserId = 1,
-                Username = "Test",
-                Password = "1234",
-                CreatedAt = new DateTime(2024, 7, 1),
-            };
-
-            var columnValues = user.GetColumnValues();
-
-            var expectedColumnValues = new Dictionary<string, object>
-            {
-                { nameof(user.UserId), user.UserId },
-                { nameof(user.Username), user.Username },
-                { nameof(user.Password), user.Password },
-                { nameof(user.CreatedAt), user.CreatedAt }
-            };
-
-            Assert.Equal(expectedColumnValues, columnValues);
-        }
-
-        [Fact]
-        public void GetColumnValues_ExampleTablePascalCase()
-        {
-            var user = new ExampleTablePascalCaseCase
-            {
-                UserId = 1,
-                Username = "Test",
-                Password = "1234",
-                CreatedAt = new DateTime(2024, 7, 1),
-            };
-
-            var columnValues = user.GetColumnValues();
-
-            var expectedColumnValues = new Dictionary<string, object>
-            {
-                { nameof(user.UserId).ToPascalCase(), user.UserId },
-                { nameof(user.Username).ToPascalCase(), user.Username },
-                { nameof(user.Password).ToPascalCase(), user.Password },
-                { nameof(user.CreatedAt).ToPascalCase(), user.CreatedAt }
-            };
-
-            Assert.Equal(expectedColumnValues, columnValues);
-        }
-
-        [Fact]
-        public void GetColumnValues_ExampleTableCamelCase()
-        {
-            var user = new ExampleTableCamelCaseCase
-            {
-                UserId = 1,
-                Username = "Test",
-                Password = "1234",
-                CreatedAt = new DateTime(2024, 7, 1),
-            };
-
-            var columnValues = user.GetColumnValues();
-
-            var expectedColumnValues = new Dictionary<string, object>
-            {
-                { nameof(user.UserId).ToCamelCase(), user.UserId },
-                { nameof(user.Username).ToCamelCase(), user.Username },
-                { nameof(user.Password).ToCamelCase(), user.Password },
-                { nameof(user.CreatedAt).ToCamelCase(), user.CreatedAt }
-            };
-
-            Assert.Equal(expectedColumnValues, columnValues);
-        }
-
-        [Fact]
-        public void GetColumnValues_ExampleTableSnakeCase()
-        {
-            var user = new ExampleTableSnakeCase
-            {
-                UserId = 1,
-                Username = "Test",
-                Password = "1234",
-                CreatedAt = new DateTime(2024, 7, 1),
-            };
-
-            var columnValues = user.GetColumnValues();
-
-
-            var expectedColumnValues = new Dictionary<string, object>
-            {
-                { nameof(user.UserId).ToSnakeCase(), user.UserId },
-                { nameof(user.Username).ToSnakeCase(), user.Username },
-                { nameof(user.Password).ToSnakeCase(), user.Password },
-                { nameof(user.CreatedAt).ToSnakeCase(), user.CreatedAt }
-            };
-
-            Assert.Equal(expectedColumnValues, columnValues);
-        }
-
-        [Fact]
-        public void GetColumnValues_ShouldReturn_CustomValue()
-        {
-            var user = new UserCustomMethods();
-
-            var columnValues = user.GetColumnValues();
-
-            var expectedColumnValues = new Dictionary<string, object>
-            {
-                { "Custom", "Value" },
-            };
-            Assert.Equal(expectedColumnValues, columnValues);
-        }
-
-        [Fact]
-        public void GetColumnValues_ShouldReturn_CustomValue2()
-        {
-            var user = new UserCustomMethods2();
-
-            var columnValues = user.GetColumnValues();
-
-            var expectedColumnValues = new Dictionary<string, object>
-            {
-                { "Custom2", "Value2" },
-            };
-            Assert.Equal(expectedColumnValues, columnValues);
-        }
         #endregion
 
         [Fact]
