@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Simplify.ORM
 {
-    public class SimplifyCommand(IDbConnection connection, ISimplifyQueryBuilder queryBuilder) : ISimplifyExecutor
+    public class SimplifyExecutor(IDbConnection connection, ISimplifyQueryBuilder queryBuilder) : ISimplifyExecutor
     {
         private readonly IDbConnection _connection = connection;
         private readonly ISimplifyQueryBuilder _queryBuilder = queryBuilder;

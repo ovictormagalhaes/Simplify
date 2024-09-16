@@ -16,7 +16,7 @@ namespace Simplify.ORM.DependencyInjection
 
             services.AddTransient<ISimplifyQueryBuilder, SimplifySQLServerQueryBuilder>();
             services.AddTransient<ISimplifyCommandBuilder, SimplifySQLServerCommandBuilder>();
-            services.AddTransient<ISimplifyExecutor, ISimplifyExecutor>();
+            services.AddTransient<ISimplifyExecutor, SimplifyExecutor>();
             services.AddTransient(typeof(ISimplifyRepository<>), typeof(SimplifyRepository<>));
         }
 
@@ -26,7 +26,7 @@ namespace Simplify.ORM.DependencyInjection
 
             services.AddTransient<ISimplifyQueryBuilder, SimplifyPostgresSQLQueryBuilder>();
             services.AddTransient<ISimplifyCommandBuilder, SimplifyPostgresSQLCommandBuilder>();
-            services.AddTransient<ISimplifyExecutor, ISimplifyExecutor>();
+            services.AddTransient<ISimplifyExecutor, SimplifyExecutor>();
             services.AddTransient(typeof(ISimplifyRepository<>), typeof(SimplifyRepository<>));
         }
 
@@ -36,7 +36,7 @@ namespace Simplify.ORM.DependencyInjection
 
             services.AddTransient<ISimplifyQueryBuilder, SimplifyMySQLQueryBuilder>();
             services.AddTransient<ISimplifyCommandBuilder, SimplifyMySQLCommandBuilder>();
-            services.AddTransient<ISimplifyExecutor, ISimplifyExecutor>();
+            services.AddTransient<ISimplifyExecutor, SimplifyExecutor>();
             services.AddTransient(typeof(ISimplifyRepository<>), typeof(SimplifyRepository<>));
         }
 

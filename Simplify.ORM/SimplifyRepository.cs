@@ -37,5 +37,9 @@ namespace Simplify.ORM
             await Executor.ExecuteAsync(CommandBuilder.AddUpdateWhereEquals(table, columnValues, column, value));
         }
 
+        public string ColumnName<T>(string property) where T : SimplifyEntity
+        {
+            return QueryBuilder.ColumnName<T>(property);
+        }
     }
 }
