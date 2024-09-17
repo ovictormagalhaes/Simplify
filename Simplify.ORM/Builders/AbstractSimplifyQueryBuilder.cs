@@ -7,7 +7,7 @@ namespace Simplify.ORM.Builders
 {
     public abstract class AbstractSimplifyQueryBuilder : ISimplifyQueryBuilder
     {
-        protected Dictionary<string, object?> Parameters { get; set; } = [];
+        protected Dictionary<string, object> Parameters { get; set; } = [];
         protected List<string> Selects { get; set; } = [];
         protected List<Tuple<SimplifyJoinOperation, string>> Joins { get; set; } = [];
         protected List<WhereOperation> Wheres { get; set; } = [];
@@ -15,7 +15,7 @@ namespace Simplify.ORM.Builders
         protected int? TopValue { get; set; }
         protected int? LimitValue { get; set; }
 
-        protected string? InsertTable { get; set; }
+        protected string InsertTable { get; set; }
 
         public virtual string BuildQuery()
         {
@@ -79,7 +79,7 @@ namespace Simplify.ORM.Builders
             return sb.Append(";").ToString().Replace("  ", " ").TrimEnd();
         }
 
-        public Dictionary<string, object?> GetParameters() => Parameters;
+        public Dictionary<string, object> GetParameters() => Parameters;
 
         public string TableName<T>() where T : SimplifyEntity
                     => SimplifyEntityHelper.TableName<T>();
@@ -102,7 +102,7 @@ namespace Simplify.ORM.Builders
 
         #region Add
 
-        public virtual ISimplifyQueryBuilder AddParameter(string name, object? value)
+        public virtual ISimplifyQueryBuilder AddParameter(string name, object value)
         {
             Parameters.Add(name, value);
             return this;
@@ -135,7 +135,7 @@ namespace Simplify.ORM.Builders
             return this;
         }
 
-        public ISimplifyQueryBuilder AddFrom(string table, string? alias = null)
+        public ISimplifyQueryBuilder AddFrom(string table, string alias = null)
         {
             if (!string.IsNullOrEmpty(alias))
                 Joins.Add(new Tuple<SimplifyJoinOperation, string>(SimplifyJoinOperation.From, $"{FormatTable(table)} {alias}"));
@@ -162,7 +162,7 @@ namespace Simplify.ORM.Builders
             return this;
         }
 
-        public ISimplifyQueryBuilder AddWhere(SimplifyWhereOperation operation, string table, string column, object? value)
+        public ISimplifyQueryBuilder AddWhere(SimplifyWhereOperation operation, string table, string column, object value)
         {
             var parameterName = GetParameterName(column);
 
@@ -277,7 +277,7 @@ namespace Simplify.ORM.Builders
                 .AddJoin(SimplifyJoinOperation.Equals, leftTable, leftColumn);
         }
 
-        public ISimplifyQueryBuilder From(string tableName, string? alias = null)
+        public ISimplifyQueryBuilder From(string tableName, string alias = null)
             => AddFrom(tableName, alias);
 
         public ISimplifyQueryBuilder Join(string rightTable, string rightColumn, string leftTable, string leftColumn)
@@ -296,7 +296,7 @@ namespace Simplify.ORM.Builders
 
         #region Where
 
-        private ISimplifyQueryBuilder WhereBase(SimplifyWhereOperation operation, string tableName, string column, object? value, bool conditional)
+        private ISimplifyQueryBuilder WhereBase(SimplifyWhereOperation operation, string tableName, string column, object value, bool conditional)
         {
             if (!conditional) 
                 return this; 
@@ -304,7 +304,7 @@ namespace Simplify.ORM.Builders
             return AddWhere(operation, tableName, column, value);
         }
 
-        public ISimplifyQueryBuilder WhereEquals(string tableName, string column, object? value, bool conditional = true)
+        public ISimplifyQueryBuilder WhereEquals(string tableName, string column, object value, bool conditional = true)
             => WhereBase(SimplifyWhereOperation.Equals, tableName, column, value, conditional);
 
         public ISimplifyQueryBuilder WhereNotEquals(string tableName, string column, object value, bool conditional = true)

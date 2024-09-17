@@ -17,7 +17,7 @@ namespace Simplify.ORM.Test
     }
 
     [Table(NamingConvention.PascalCase)]
-    public partial class ExampleTablePascalCaseCase : SimplifyEntity
+    public partial class ExampleTablePascalCase : SimplifyEntity
     {
         public int UserId { get; set; }
         public string? Username { get; set; }
@@ -26,7 +26,7 @@ namespace Simplify.ORM.Test
     }
 
     [Table(NamingConvention.CamelCase)]
-    public partial class ExampleTableCamelCaseCase : SimplifyEntity
+    public partial class ExampleTableCamelCase : SimplifyEntity
     {
         public int UserId { get; set; }
         public string? Username { get; set; }
@@ -54,20 +54,17 @@ namespace Simplify.ORM.Test
         }
     }
 
-    [Table(Name = "Custom2")]
+    [Table(Name = "Custom2", ColumnsNamingConvention = NamingConvention.PascalCase)]
     public partial class UserCustomMethods2 : SimplifyEntity
     {
-
         public override IEnumerable<SimplifyEntityProperty> GetProperties()
         {
             return [ new ("Custom2", "Custom2", "Value") ];
         }
     }
 
-
     public class SimplifyEntityTest
     {
-
         #region GetProperties
 
         [Fact]
@@ -97,7 +94,7 @@ namespace Simplify.ORM.Test
         [Fact]
         public void GetProperties_ExampleTablePascalCase()
         {
-            var user = new ExampleTablePascalCaseCase
+            var user = new ExampleTablePascalCase
             {
                 UserId = 1,
                 Username = "Test",
@@ -121,7 +118,7 @@ namespace Simplify.ORM.Test
         [Fact]
         public void GetProperties_ExampleTableCamelCase()
         {
-            var user = new ExampleTableCamelCaseCase
+            var user = new ExampleTableCamelCase
             {
                 UserId = 1,
                 Username = "Test",
@@ -196,8 +193,10 @@ namespace Simplify.ORM.Test
 
         #endregion
 
+        #region GetTableName
+
         [Fact]
-        public void GetTableName_ShouldReturn_DefaultValue()
+        public void GetTableName_ExampleWithoutAttribute_ShouldReturn_CorrectValue()
         {
             var user = new ExampleWithoutAttribute();
 
@@ -209,7 +208,43 @@ namespace Simplify.ORM.Test
         }
 
         [Fact]
-        public void GetTableName_ShouldReturn_CustomValue()
+        public void GetTableName_ExampleTableSnakeCase_ShouldReturn_CorrectValue()
+        {
+            var user = new ExampleTableSnakeCase();
+
+            var tableName = user.GetTableName();
+
+            var expectedTableName = nameof(ExampleTableSnakeCase).ToSnakeCase();
+
+            Assert.Equal(expectedTableName, tableName);
+        }
+
+        [Fact]
+        public void GetTableName_ExampleTablePascalCase_ShouldReturn_CorrectValue()
+        {
+            var user = new ExampleTablePascalCase();
+
+            var tableName = user.GetTableName();
+
+            var expectedTableName = nameof(ExampleTablePascalCase).ToPascalCase();
+
+            Assert.Equal(expectedTableName, tableName);
+        }
+
+        [Fact]
+        public void GetTableName_ExampleTableCamelCase_ShouldReturn_CorrectValue()
+        {
+            var user = new ExampleTableCamelCase();
+
+            var tableName = user.GetTableName();
+
+            var expectedTableName = nameof(ExampleTableCamelCase).ToCamelCase();
+
+            Assert.Equal(expectedTableName, tableName);
+        }
+
+        [Fact]
+        public void GetTableName_UserCustomMethods_ShouldReturn_CorrectValue()
         {
             var user = new UserCustomMethods();
 
@@ -221,7 +256,7 @@ namespace Simplify.ORM.Test
         }
 
         [Fact]
-        public void GetTableName_ShouldReturn_CustomValue2()
+        public void GetTableName_UserCustomMethods2_ShouldReturn_CorrectValue()
         {
             var user = new UserCustomMethods2();
 
@@ -231,5 +266,7 @@ namespace Simplify.ORM.Test
 
             Assert.Equal(expectedTableName, tableName);
         }
+
+        #endregion
     }
 }

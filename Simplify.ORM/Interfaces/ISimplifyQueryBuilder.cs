@@ -5,7 +5,7 @@ namespace Simplify.ORM.Interfaces
     public interface ISimplifyQueryBuilder
     {
         string BuildQuery();
-        Dictionary<string, object?> GetParameters();
+        Dictionary<string, object> GetParameters();
 
         string FormatTable(string table);
         string FormatColumn(string column);
@@ -20,7 +20,7 @@ namespace Simplify.ORM.Interfaces
         ISimplifyQueryBuilder AddSelect(Tuple<string, string> tableColumn);
         ISimplifyQueryBuilder AddSelect(List<Tuple<string, string>> tableColumns);
         ISimplifyQueryBuilder AddTop(int top);
-        ISimplifyQueryBuilder AddFrom(string table, string? alias = null);
+        ISimplifyQueryBuilder AddFrom(string table, string alias = null);
         ISimplifyQueryBuilder AddJoin(SimplifyJoinOperation operation, string table);
         ISimplifyQueryBuilder AddJoin(SimplifyJoinOperation operation, string table, string column);
         ISimplifyQueryBuilder AddWhere(SimplifyWhereOperation operation);
@@ -35,12 +35,12 @@ namespace Simplify.ORM.Interfaces
         ISimplifyQueryBuilder SelectAllFieldsFrom(string table);
         ISimplifyQueryBuilder Top(int top);
         ISimplifyQueryBuilder Limit(int limit);
-        ISimplifyQueryBuilder From(string table, string? alias = null);
+        ISimplifyQueryBuilder From(string table, string alias = null);
         ISimplifyQueryBuilder Join(string rightTable, string rightColumn, string leftTable, string leftColumn);
         ISimplifyQueryBuilder InnerJoin(string rightTable, string rightColumn, string leftTable, string leftColumn);
         ISimplifyQueryBuilder LeftJoin(string rightTable, string rightColumn, string leftTable, string leftColumn);
         ISimplifyQueryBuilder RightJoin(string rightTable, string rightColumn, string leftTable, string leftColumn);
-        ISimplifyQueryBuilder WhereEquals(string table, string column, object? value, bool conditional = true);
+        ISimplifyQueryBuilder WhereEquals(string table, string column, object value, bool conditional = true);
         ISimplifyQueryBuilder WhereNotEquals(string table, string column, object value, bool conditional = true);
         ISimplifyQueryBuilder WhereGreater(string table, string column, object value, bool conditional = true);
         ISimplifyQueryBuilder WhereGreaterOrEqual(string table, string column, object value, bool conditional = true);

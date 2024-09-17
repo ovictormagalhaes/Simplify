@@ -21,11 +21,11 @@ namespace Simplify.ORM.Interfaces
         Task<T> FirstOrDefaultAsync<T>(ISimplifyQueryBuilder queryBuilder) where T : ISimplifyEntity;
         Task<T> FirstOrDefaultAsync<T>(ISimplifyQuery query) where T : ISimplifyEntity;
 
-        Task HydrateAsync<T, U>(T entity, Expression<Func<T, object?>> objectFKExpression, Expression<Func<T, object?>> objectMemberToHydrateExpression, Expression<Func<U, object?>> newObjectFKExpression)
+        Task HydrateAsync<T, U>(T entity, Expression<Func<T, object>> objectFKExpression, Expression<Func<T, object>> objectMemberToHydrateExpression, Expression<Func<U, object>> newObjectFKExpression)
             where T : ISimplifyEntity
             where U : ISimplifyEntity;
 
-        Task HydrateAsync<T, U>(IEnumerable<T> entity, Expression<Func<T, object?>> objectFKExpression, Expression<Func<T, object?>> objectMemberToHydrateExpression, Expression<Func<U, object?>> newObjectFKExpression)
+        Task HydrateAsync<T, U>(IEnumerable<T> entity, Expression<Func<T, object>> objectFKExpression, Expression<Func<T, object>> objectMemberToHydrateExpression, Expression<Func<U, object>> newObjectFKExpression)
             where T : ISimplifyEntity
             where U : ISimplifyEntity;
     }

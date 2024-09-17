@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.0.6</Version>
+    <Version>1.0.8</Version>
     <OutputType>Library</OutputType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -15,7 +15,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <AnalysisLevel>none</AnalysisLevel>
     <Authors>Victor Magalhães</Authors>
-    <PackageReleaseNotes>Fix Generator injection</PackageReleaseNotes>
+    <PackageReleaseNotes>Fix SimplifyEntityHelper</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Copyright>Copyright (c) 2024 Victor Magalhães</Copyright>
     <RepositoryType>git</RepositoryType>
@@ -34,6 +34,10 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Update="icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -42,18 +46,14 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
-    <ProjectReference Include="..\Simplify.ORM.Generator\Simplify.ORM.Generator.csproj" OutputItemType="Analyzer" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <None Include="..\Simplify.ORM.Generator\bin\$(Configuration)\netstandard2.0\Simplify.ORM.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
     
-  <ItemGroup>
-    <None Update="icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-
 </Project>

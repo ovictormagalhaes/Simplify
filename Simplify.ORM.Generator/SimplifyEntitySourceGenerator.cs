@@ -85,6 +85,19 @@ namespace Simplify.ORM.Generator
             var attributeTableName = classInfo.GetAttributeValue("Table", "Name")?.ToString() ?? null;
             var attributeTableColumnsNamingConvention = classInfo.GetAttributeValue("Table", "ColumnsNamingConvention")?.ToString() ?? null;
 
+            var tableName = classInfo.ClassName;
+
+            if(attributeTableColumnsNamingConvention != null && Enum.TryParse(attributeTableColumnsNamingConvention, out NamingConvention tableNamingConvention))
+            {
+                tableName = tableNamingConvention switch
+                {
+                    NamingConvention.PascalCase => string.Copy(classInfo.ClassName).ToPascalCase(),
+                    NamingConvention.CamelCase => string.Copy(classInfo.ClassName).ToCamelCase(),
+                    NamingConvention.SnakeCase => string.Copy(classInfo.ClassName).ToSnakeCase(),
+                    _ => classInfo.ClassName
+                };
+
+            }
             Enum.TryParse(attributeTableColumnsNamingConvention, ignoreCase: true, out NamingConvention columnNamingConvention);
 
             sb.Append(
@@ -125,18 +138,18 @@ namespace Simplify.ORM.Generator
 
             if (!classInfo.HasMethod("GetTableName"))
             {
-                if (!string.IsNullOrWhiteSpace(attributeTableName))
-                    sb.AppendLine($"        public override string GetTableName() => \"{attributeTableName}\";");
-                else
-                    sb.AppendLine($"        public override string GetTableName() => nameof({classInfo.ClassName});");
+//                if (!string.IsNullOrWhiteSpace(attributeTableName))
+//                    sb.AppendLine($"        public override string GetTableName() => \"{attributeTableName}\";");
+//                else\"
+                    sb.AppendLine($"        public override string GetTableName() => \"{tableName}\";");
             }
 
             if (!classInfo.HasMethod("TableName"))
             {
-                if (!string.IsNullOrWhiteSpace(attributeTableName))
-                    sb.AppendLine($"        public static string TableName => \"{attributeTableName}\";");
-                else
-                    sb.AppendLine($"        public string TableName => nameof({classInfo.ClassName});");
+//                if (!string.IsNullOrWhiteSpace(attributeTableName))
+//                    sb.AppendLine($"        public static string TableName => \"{attributeTableName}\";");
+//                else
+                    sb.AppendLine($"        public new static string TableName => \"{tableName}\";");
             }
 
             sb.AppendLine("    }");
