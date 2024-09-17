@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.0.3</Version>
+    <Version>1.0.6</Version>
     <OutputType>Library</OutputType>
+    <NeutralLanguage>en-US</NeutralLanguage>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Simplify</Title>
@@ -14,13 +15,14 @@
     <PackageIcon>icon.png</PackageIcon>
     <AnalysisLevel>none</AnalysisLevel>
     <Authors>Victor Magalhães</Authors>
-    <PackageReleaseNotes>Remove GetColumnValues from SourceGenerator</PackageReleaseNotes>
+    <PackageReleaseNotes>Fix Generator injection</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Copyright>Copyright (c) 2024 Victor Magalhães</Copyright>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ORM; Database</PackageTags>
     <RepositoryUrl>https://github.com/ovictormagalhaes/Simplify</RepositoryUrl>
     <PackageId>Simplify.ORM</PackageId>
+    <Description>Simplify your life as a Developer</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,8 +42,13 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
+    <ProjectReference Include="..\Simplify.ORM.Generator\Simplify.ORM.Generator.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\Simplify.ORM.Generator\bin\$(Configuration)\netstandard2.0\Simplify.ORM.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+    
   <ItemGroup>
     <None Update="icon.png">
       <Pack>True</Pack>

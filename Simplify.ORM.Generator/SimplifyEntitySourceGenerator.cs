@@ -1,8 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using Simplify.ORM.Enumerations;
-using Simplify.ORM.Extensions;
 using System;
 using System.Linq;
 using System.Text;

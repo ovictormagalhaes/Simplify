@@ -88,9 +88,9 @@ namespace Simplify.ORM
 
         public async Task HydrateAsync<T, U>(
         T entity,
-        Expression<Func<T, object?>> objectFKExpression,
-        Expression<Func<T, object?>> objectMemberToHydrateExpression,
-        Expression<Func<U, object?>> newObjectFKExpression)
+        Expression<Func<T, object>> objectFKExpression,
+        Expression<Func<T, object>> objectMemberToHydrateExpression,
+        Expression<Func<U, object>> newObjectFKExpression)
     where T : ISimplifyEntity
     where U : ISimplifyEntity
         {
@@ -115,9 +115,9 @@ namespace Simplify.ORM
 
         public async Task HydrateAsync<T, U>(
             IEnumerable<T> entities,
-            Expression<Func<T, object?>> objectFKExpression,
-            Expression<Func<T, object?>> objectMemberToHydrateExpression,
-            Expression<Func<U, object?>> newObjectFKExpression)
+            Expression<Func<T, object>> objectFKExpression,
+            Expression<Func<T, object>> objectMemberToHydrateExpression,
+            Expression<Func<U, object>> newObjectFKExpression)
                 where T : ISimplifyEntity
                 where U : ISimplifyEntity
         {
