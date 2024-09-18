@@ -103,12 +103,8 @@ namespace Simplify.ORM
             var tableNameU = entityU?.GetTableName();
             var columnNameFKU = entityU?.GetColumnName(newObjectFK.Name);
 
-            if (entityU == null || tableNameU == null || columnNameFKU == null)
-                return;
-
             var query = _queryBuilder
-                .SelectAllFields(tableNameU)
-                .From(tableNameU)
+                .SelectAllFieldsFrom(tableNameU)
                 .WhereEquals(tableNameU, columnNameFKU, fkValueT);
 
             var result = await QueryAsync<U>(query);
@@ -133,9 +129,6 @@ namespace Simplify.ORM
             U entityU = Activator.CreateInstance<U>();
             var tableNameU = entityU.GetTableName();
             var columnNameFKU = entityU.GetColumnName(newObjectFK.Name)!;
-
-            if (entityU == null || tableNameU == null || columnNameFKU == null)
-                return;
 
             var query = _queryBuilder
                 .SelectAllFieldsFrom(tableNameU)
