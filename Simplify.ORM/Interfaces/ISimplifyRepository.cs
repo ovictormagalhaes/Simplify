@@ -5,8 +5,10 @@ namespace Simplify.ORM.Interfaces
 {
     public interface ISimplifyRepository<T> where T : SimplifyEntity
     {
-        public Task<T> BaseSelectByColumnEqualsAsync(string column, object value);
-        public Task BaseInsertAsync(T obj);
-        public Task BaseUpdateWhereColumnEqualsAsync(T obj, string column, object value);
+        public Task<T> FirstOrDefaultByColumnEqualsAsync(string column, object value);
+        public Task<IEnumerable<T>> QueryByColumnEqualsAsync(string column, object value);
+        public Task<IEnumerable<T>> QueryByColumnEqualsAsync(string column, List<object> value);
+        public Task InsertAsync(T obj);
+        public Task UpdateWhereColumnEqualsAsync(T obj, string column, object value);
     }
 }

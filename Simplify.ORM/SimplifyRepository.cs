@@ -23,7 +23,7 @@ namespace Simplify.ORM
         public string ColumnName<O>(string property) where O : SimplifyEntity => SimplifyEntityHelper.ColumnName<O>(property);
 
 
-        public async Task<T> BaseSelectByColumnEqualsAsync(string column, object value)
+        public async Task<T> FirstOrDefaultByColumnEqualsAsync(string column, object value)
         {
             var entity = Activator.CreateInstance<T>();
             var table = entity.GetTableName();
@@ -33,17 +33,37 @@ namespace Simplify.ORM
             return await Executor.FirstOrDefaultAsync<T>(query);
         }
 
-        public async Task BaseInsertAsync(T obj)
+        public async Task InsertAsync(T obj)
         {
             await Executor.ExecuteAsync(CommandBuilder.AddInsert(obj));
         }
 
-        public async Task BaseUpdateWhereColumnEqualsAsync(T obj, string column, object value)
+        public async Task UpdateWhereColumnEqualsAsync(T obj, string column, object value)
         {
             var table = obj.GetTableName();
             var columnValues = obj.GetColumnValues();
 
             await Executor.ExecuteAsync(CommandBuilder.AddUpdateWhereEquals(table, columnValues, column, value));
+        }
+
+        public async Task<IEnumerable<T>> QueryByColumnEqualsAsync(string column, object value)
+        {
+            var entity = Activator.CreateInstance<T>();
+            var table = entity.GetTableName();
+
+            var query = QueryBuilder.SelectAllFieldsFrom(table).WhereEquals(table, column, value);
+
+            return await Executor.QueryAsync<T>(query);
+        }
+
+        public async Task<IEnumerable<T>> QueryByColumnEqualsAsync(string column, List<object> value)
+        {
+            var entity = Activator.CreateInstance<T>();
+            var table = entity.GetTableName();
+
+            var query = QueryBuilder.SelectAllFieldsFrom(table).WhereIn(table, column, value);
+
+            return await Executor.QueryAsync<T>(query);
         }
     }
 }
