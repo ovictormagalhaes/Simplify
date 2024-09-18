@@ -16,6 +16,10 @@ namespace Simplify.ORM.Builders
 
         public Dictionary<string, object> GetParameters() => Parameters;
 
+        public virtual string FormatTable(string table) => table;
+
+        public virtual string FormatColumn(string column) => column;
+
         public virtual string BuildQuery()
         {
             var sb = new StringBuilder();

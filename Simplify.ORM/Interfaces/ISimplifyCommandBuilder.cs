@@ -7,6 +7,9 @@ namespace Simplify.ORM.Interfaces
         string BuildQuery();
         Dictionary<string, object> GetParameters();
 
+        string FormatTable(string table);
+        string FormatColumn(string column);
+
         ISimplifyCommandBuilder AddInsert(ISimplifyEntity entity);
         ISimplifyCommandBuilder AddInsert(string table, Dictionary<string, object> columnValues);
 
