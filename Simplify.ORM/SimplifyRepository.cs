@@ -5,9 +5,9 @@ namespace Simplify.ORM
 {
     public class SimplifyRepository<T> : ISimplifyRepository<T> where T : SimplifyEntity
     {
-        public ISimplifyQueryBuilder QueryBuilder { get; protected set }
-        public ISimplifyCommandBuilder CommandBuilder { get; protected set }
-        public ISimplifyExecutor Executor { get; protected set }
+        public ISimplifyQueryBuilder QueryBuilder { get; protected set; }
+        public ISimplifyCommandBuilder CommandBuilder { get; protected set; }
+        public ISimplifyExecutor Executor { get; protected set; }
 
         public SimplifyRepository(ISimplifyQueryBuilder queryBuilder, ISimplifyCommandBuilder commandBuilder, ISimplifyExecutor executor)
         {
