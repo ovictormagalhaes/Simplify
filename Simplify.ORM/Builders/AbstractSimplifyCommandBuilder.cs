@@ -35,8 +35,8 @@ namespace Simplify.ORM.Builders
 
             if (!string.IsNullOrEmpty(Table) && UpdateValues.Any())
             {
-                sb.Append($"UPDATE {Table} SET ");
-                sb.Append(string.Join(", ", UpdateValues.Select(x => $"{x.Key} = @{x.Key}")));
+                sb.Append($"UPDATE {FormatTable(Table)} SET ");
+                sb.Append(string.Join(", ", UpdateValues.Select(x => $"{FormatColumn(x.Key)} = @{x.Key}")));
                 sb.Append(" ");
 
                 if (UpdateWheres.Any())
