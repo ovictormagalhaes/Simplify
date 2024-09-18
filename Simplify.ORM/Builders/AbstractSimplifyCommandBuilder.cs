@@ -51,7 +51,7 @@ namespace Simplify.ORM.Builders
                     {
                         var whereTable = where.LeftTable!;
                         var column = where.LeftColumn!;
-                        sb.Append($"{Table}.{column} {operationSymbol} {parameterName} ");
+                        sb.Append($"{FormatTable(Table)}.{FormatColumn(column)} {operationSymbol} {parameterName} ");
                     }
                     else
                         sb.Append($"{operationSymbol} {parameterName} ");

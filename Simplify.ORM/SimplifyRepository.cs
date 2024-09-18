@@ -33,15 +33,15 @@ namespace Simplify.ORM
             return await Executor.FirstOrDefaultAsync<T>(query);
         }
 
-        public async Task InsertAsync(T obj)
+        public async Task InsertAsync(T entity)
         {
-            await Executor.ExecuteAsync(CommandBuilder.AddInsert(obj));
+            await Executor.ExecuteAsync(CommandBuilder.AddInsert(entity));
         }
 
-        public async Task UpdateWhereColumnEqualsAsync(T obj, string column, object value)
+        public async Task UpdateWhereColumnEqualsAsync(T entity, string column, object value)
         {
-            var table = obj.GetTableName();
-            var columnValues = obj.GetColumnValues();
+            var table = entity.GetTableName();
+            var columnValues = entity.GetColumnValues();
 
             await Executor.ExecuteAsync(CommandBuilder.AddUpdateWhereEquals(table, columnValues, column, value));
         }

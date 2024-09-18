@@ -24,7 +24,7 @@ namespace Simplify.ORM.Test.Builders
             ];
         }
 
-        private static ISimplifyCommandBuilder GetCommandInstance(Type type) => (ISimplifyCommandBuilder)Activator.CreateInstance(type);
+        private static ISimplifyCommandBuilder GetCommandInstance(Type type) => (ISimplifyCommandBuilder)Activator.CreateInstance(type)!;
 
 
         [Theory]

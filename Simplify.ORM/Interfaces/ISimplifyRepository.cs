@@ -8,7 +8,7 @@ namespace Simplify.ORM.Interfaces
         public Task<T> FirstOrDefaultByColumnEqualsAsync(string column, object value);
         public Task<IEnumerable<T>> QueryByColumnEqualsAsync(string column, object value);
         public Task<IEnumerable<T>> QueryByColumnEqualsAsync(string column, List<object> value);
-        public Task InsertAsync(T obj);
-        public Task UpdateWhereColumnEqualsAsync(T obj, string column, object value);
+        public Task InsertAsync(T entity);
+        public Task UpdateWhereColumnEqualsAsync(T entity, string column, object value);
     }
 }
