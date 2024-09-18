@@ -2,17 +2,11 @@
 using Simplify.ORM.Builders;
 using Simplify.ORM.Enumerations;
 using Simplify.ORM.Interfaces;
+using Simplify.ORM.Test.Entities;
 using Xunit;
 
 namespace Simplify.ORM.Test.Builders
 {
-    [Table(NamingConvention.PascalCase)]
-    public partial class UserMockEntity : SimplifyEntity
-    {
-        public int UserMockId { get; set; }
-    }
-
-
     public class SimplifyCommandBuilderTest
     {
         public static IEnumerable<object[]> Types()

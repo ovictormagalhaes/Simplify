@@ -2,9 +2,11 @@
 {
     public interface ISimplifyEntity
     {
+        bool IsPersisted { get; set; }
+
         string GetTableName();
         public string GetColumnName(string property);
-        IEnumerable<SimplifyEntityProperty> GetProperties();
+        List<SimplifyEntityProperty> GetProperties();
         Dictionary<string, object> GetColumnValues();
     }
 }

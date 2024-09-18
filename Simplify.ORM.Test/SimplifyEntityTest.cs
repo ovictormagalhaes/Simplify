@@ -1,68 +1,11 @@
 ﻿using Simplify.ORM.Attributes;
 using Simplify.ORM.Enumerations;
 using Simplify.ORM.Extensions;
+using Simplify.ORM.Test.Entities;
 using Xunit;
 
 namespace Simplify.ORM.Test
 {
-    public partial class ExampleWithoutAttribute : SimplifyEntity
-    {
-        public int UserId { get; set; }
-        public string? Username { get; set; }
-        public string? Password { get; set; }
-        public DateTime CreatedAt { get; set; }
-
-        public const int SomeConst = 1;
-        public virtual List<string>? Permissions { get; set; }
-    }
-
-    [Table(NamingConvention.PascalCase)]
-    public partial class ExampleTablePascalCase : SimplifyEntity
-    {
-        public int UserId { get; set; }
-        public string? Username { get; set; }
-        public string? Password { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
-
-    [Table(NamingConvention.CamelCase)]
-    public partial class ExampleTableCamelCase : SimplifyEntity
-    {
-        public int UserId { get; set; }
-        public string? Username { get; set; }
-        public string? Password { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
-
-    [Table(NamingConvention.SnakeCase)]
-    public partial class ExampleTableSnakeCase : SimplifyEntity
-    {
-        public int UserId { get; set; }
-        public string? Username { get; set; }
-        public string? Password { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
-
-    [Table("Custom")]
-    public partial class UserCustomMethods : SimplifyEntity
-    {
-        public override IEnumerable<SimplifyEntityProperty> GetProperties()
-        {
-            return [
-                new ("Custom", "Custom", "Value")
-            ]; 
-        }
-    }
-
-    [Table(Name = "Custom2", ColumnsNamingConvention = NamingConvention.PascalCase)]
-    public partial class UserCustomMethods2 : SimplifyEntity
-    {
-        public override IEnumerable<SimplifyEntityProperty> GetProperties()
-        {
-            return [ new ("Custom2", "Custom2", "Value") ];
-        }
-    }
-
     public class SimplifyEntityTest
     {
         #region GetProperties

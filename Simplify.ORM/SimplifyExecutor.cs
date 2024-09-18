@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Simplify.ORM.Extensions;
 using Simplify.ORM.Interfaces;
 using System.Data;
 using System.Linq.Expressions;
@@ -63,19 +64,19 @@ namespace Simplify.ORM
         }
 
         public IEnumerable<T> Query<T>(ISimplifyQueryBuilder queryBuilder) where T : ISimplifyEntity
-            => _connection.Query<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters());
+            => _connection.Query<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters()).SetIsPersisted();
 
         public IEnumerable<T> Query<T>(ISimplifyQuery query) where T : ISimplifyEntity
             => Query<T>(query.GetBuilder());
 
         public async Task<IEnumerable<T>> QueryAsync<T>(ISimplifyQueryBuilder queryBuilder) where T : ISimplifyEntity
-            => await _connection.QueryAsync<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters());
+            => (await _connection.QueryAsync<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters())).SetIsPersisted();
 
         public async Task<IEnumerable<T>> QueryAsync<T>(ISimplifyQuery query) where T : ISimplifyEntity
             => await QueryAsync<T>(query.GetBuilder());
     
         public T FirstOrDefault<T>(ISimplifyQueryBuilder queryBuilder) where T : ISimplifyEntity
-            => _connection.QueryFirstOrDefault<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters());
+            => _connection.QueryFirstOrDefault<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters()).SetIsPersisted();
 
         public T FirstOrDefault<T>(ISimplifyQuery query) where T : ISimplifyEntity
             => FirstOrDefault<T>(query.GetBuilder());
@@ -90,9 +91,7 @@ namespace Simplify.ORM
         T entity,
         Expression<Func<T, object>> objectFKExpression,
         Expression<Func<T, object>> objectMemberToHydrateExpression,
-        Expression<Func<U, object>> newObjectFKExpression)
-    where T : ISimplifyEntity
-    where U : ISimplifyEntity
+        Expression<Func<U, object>> newObjectFKExpression) where T : ISimplifyEntity where U : ISimplifyEntity
         {
             var objectFK = GetPropertyInfo(objectFKExpression);
             var objectMember = GetPropertyInfo(objectMemberToHydrateExpression);
@@ -100,8 +99,12 @@ namespace Simplify.ORM
 
             var fkValueT = objectFK.GetValue(entity);
 
-            var tableNameU = default(U)!.GetTableName();
-            var columnNameFKU = default(U)!.GetColumnName(newObjectFK.Name)!;
+            U entityU = Activator.CreateInstance<U>();
+            var tableNameU = entityU?.GetTableName();
+            var columnNameFKU = entityU?.GetColumnName(newObjectFK.Name);
+
+            if (entityU == null || tableNameU == null || columnNameFKU == null)
+                return;
 
             var query = _queryBuilder
                 .SelectAllFields(tableNameU)
@@ -127,12 +130,15 @@ namespace Simplify.ORM
 
             var fkValueT = objectFK.GetValue(entities);
 
-            var tableNameU = default(U)!.GetTableName();
-            var columnNameFKU = default(U)!.GetColumnName(newObjectFK.Name)!;
+            U entityU = Activator.CreateInstance<U>();
+            var tableNameU = entityU.GetTableName();
+            var columnNameFKU = entityU.GetColumnName(newObjectFK.Name)!;
+
+            if (entityU == null || tableNameU == null || columnNameFKU == null)
+                return;
 
             var query = _queryBuilder
-                .SelectAllFields(tableNameU)
-                .From(tableNameU)
+                .SelectAllFieldsFrom(tableNameU)
                 .WhereEquals(tableNameU, columnNameFKU, fkValueT);
             var result = await QueryAsync<U>(query);
 

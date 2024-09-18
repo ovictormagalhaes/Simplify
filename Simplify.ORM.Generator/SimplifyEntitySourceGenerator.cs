@@ -113,7 +113,7 @@ namespace Simplify.ORM.Generator
 
             if (!classInfo.HasMethod("GetProperties"))
             {
-                sb.AppendLine("        public override IEnumerable<SimplifyEntityProperty> GetProperties()");
+                sb.AppendLine("        public override List<SimplifyEntityProperty> GetProperties()");
                 sb.AppendLine("        {");
                 sb.AppendLine("            var columnValues = new List<SimplifyEntityProperty>();");
 

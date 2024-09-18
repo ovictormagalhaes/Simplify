@@ -1,16 +1,11 @@
 ﻿using Simplify.ORM.Attributes;
 using Simplify.ORM.Enumerations;
+using Simplify.ORM.Test.Entities;
 using Simplify.ORM.Utils;
 using Xunit;
 
 namespace Simplify.ORM.Test.Utils
 {
-    [Table(NamingConvention.PascalCase)]
-    public partial class MockEntity : SimplifyEntity
-    {
-        public int MockId { get; set; }
-    }
-
     public class SimplifyEntityHelperTests
     {
         [Fact]

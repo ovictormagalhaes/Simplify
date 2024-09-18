@@ -18,9 +18,10 @@ namespace Simplify.ORM
 
     public abstract class SimplifyEntity : ISimplifyEntity
     {
+        public bool IsPersisted { get; set; }
         public virtual string GetTableName() => GetType().Name;
         public string GetColumnName(string property) => GetProperties().FirstOrDefault(x => x.PropertyName == property)?.PropertyName;
-        public virtual IEnumerable<SimplifyEntityProperty> GetProperties() => [];
+        public virtual List<SimplifyEntityProperty> GetProperties() => [];
         public virtual Dictionary<string, object> GetColumnValues() 
         {
             var properties = GetProperties();
