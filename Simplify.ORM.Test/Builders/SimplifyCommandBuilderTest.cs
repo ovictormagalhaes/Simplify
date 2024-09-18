@@ -49,6 +49,39 @@ namespace Simplify.ORM.Test.Builders
             Assert.Equal(expectedQuery, query);
         }
 
+        [Theory]
+        [MemberData(nameof(Types))]
+        public void AddInsertTest2(Type type)
+        {
+            var table = "User";
+            var columnValues = new Dictionary<string, object>() {
+                { "Username", "Victor" },
+                { "Password", "secret" }
+            };
+            var columnValues2 = new Dictionary<string, object>() {
+                { "Username", "Test" },
+                { "Password", "UltraSecret" }
+            };
+
+            var queryBuilder = GetCommandInstance(type)
+                .AddInsert(table, columnValues)
+                .AddInsert(table, columnValues2);
+
+            var query = queryBuilder.BuildQuery();
+
+            string expectedQuery;
+            if (type == typeof(SimplifySQLServerCommandBuilder))
+                expectedQuery = "INSERT INTO [User] ([Username], [Password]) VALUES (@Username, @Password), (@Username1, @Password1);";
+            else if (type == typeof(SimplifyPostgresSQLCommandBuilder))
+                expectedQuery = "INSERT INTO \"User\" (\"Username\", \"Password\") VALUES (@Username, @Password), (@Username1, @Password1);";
+            else if (type == typeof(SimplifyMySQLCommandBuilder))
+                expectedQuery = "INSERT INTO `User` (`Username`, `Password`) VALUES (@Username, @Password), (@Username1, @Password1);";
+            else
+                throw new NotSupportedException("Unsupported type");
+
+            Assert.Equal(expectedQuery, query);
+        }
+
         [Fact]
         public void AddInsertMockEntityTest()
         {

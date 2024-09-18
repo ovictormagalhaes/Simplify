@@ -145,7 +145,7 @@ namespace Simplify.ORM
             SetObjectMemberValue(entities, objectMember, result, objectFK, newObjectFK);
         }
 
-        private PropertyInfo GetPropertyInfo(LambdaExpression expression)
+        public static PropertyInfo GetPropertyInfo(LambdaExpression expression)
         {
             if (expression.Body is MemberExpression memberExpression)
             {
@@ -160,7 +160,7 @@ namespace Simplify.ORM
             throw new ArgumentException("Invalid expression", nameof(expression));
         }
 
-        private void SetObjectMemberValue<T, U>(T entity, PropertyInfo objectMember, IEnumerable<U> result)
+        public static void SetObjectMemberValue<T, U>(T entity, PropertyInfo objectMember, IEnumerable<U> result)
             where T : ISimplifyEntity
             where U : ISimplifyEntity
         {
@@ -190,7 +190,7 @@ namespace Simplify.ORM
                 throw new InvalidOperationException($"Property type '{objectMember.PropertyType}' not supported.");
         }
 
-        private void SetObjectMemberValue<T, U>(
+        public static void SetObjectMemberValue<T, U>(
             IEnumerable<T> entities,
             PropertyInfo objectMember,
             IEnumerable<U> result,

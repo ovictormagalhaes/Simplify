@@ -1,10 +1,5 @@
 ﻿using Simplify.ORM.Attributes;
 using Simplify.ORM.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Simplify.ORM.Test.Entities
 {
@@ -86,6 +81,21 @@ namespace Simplify.ORM.Test.Entities
     }
 
     public partial class RelatedEntity : SimplifyEntity
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public partial class TestEntity : SimplifyEntity
+    {
+        public int Id { get; set; }
+        public ICollection<RelatedEntity> RelatedEntities { get; set; } = new List<RelatedEntity>();
+        public List<RelatedEntity> RelatedEntitiesList { get; set; } = new List<RelatedEntity>();
+        public RelatedEntity SingleRelatedEntity { get; set; }
+        public RelatedEntity? NullableRelatedEntity { get; set; }
+    }
+
+    public partial class AdditionalEntity : SimplifyEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }
