@@ -2,7 +2,6 @@
 using Simplify.ORM.Builders;
 using Simplify.ORM.Enumerations;
 using Simplify.ORM.Interfaces;
-using System.Data;
 using Xunit;
 
 namespace Simplify.ORM.Test.Builders

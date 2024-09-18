@@ -18,8 +18,6 @@ namespace Simplify.ORM
 
     public abstract class SimplifyEntity : ISimplifyEntity
     {
-        public static string TableName { get; } = string.Empty;
-
         public virtual string GetTableName() => GetType().Name;
         public string GetColumnName(string property) => GetProperties().FirstOrDefault(x => x.PropertyName == property)?.PropertyName;
         public virtual IEnumerable<SimplifyEntityProperty> GetProperties() => [];
@@ -30,7 +28,7 @@ namespace Simplify.ORM
             if(properties is null)
                 return [];
 
-            return properties.ToDictionary(prop => prop.ColumnName!, prop => prop.Value!);
+            return properties.ToDictionary(prop => prop.ColumnName, prop => prop.Value);
         }
     }
 }

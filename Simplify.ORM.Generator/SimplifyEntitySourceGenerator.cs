@@ -140,16 +140,8 @@ namespace Simplify.ORM.Generator
             {
 //                if (!string.IsNullOrWhiteSpace(attributeTableName))
 //                    sb.AppendLine($"        public override string GetTableName() => \"{attributeTableName}\";");
-//                else\"
-                    sb.AppendLine($"        public override string GetTableName() => \"{tableName}\";");
-            }
-
-            if (!classInfo.HasMethod("TableName"))
-            {
-//                if (!string.IsNullOrWhiteSpace(attributeTableName))
-//                    sb.AppendLine($"        public static string TableName => \"{attributeTableName}\";");
 //                else
-                    sb.AppendLine($"        public new static string TableName => \"{tableName}\";");
+                    sb.AppendLine($"        public override string GetTableName() => \"{tableName}\";");
             }
 
             sb.AppendLine("    }");

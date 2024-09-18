@@ -16,7 +16,11 @@ namespace Simplify.ORM
             Executor = executor;
         }
 
-        public async Task<T> GetByIdAsync<O>(T obj, string column, object value)
+        public string ColumnName<O>(string property) where O : SimplifyEntity => SimplifyEntityHelper.ColumnName<O>(property);
+
+        public string TableName<O>() where O : SimplifyEntity => SimplifyEntityHelper.TableName<O>();
+
+        public async Task<T> BaseSelectByIdAsync<O>(T obj, string column, object value)
         {
             var table = obj.GetTableName();
             
@@ -25,21 +29,17 @@ namespace Simplify.ORM
             return await Executor.FirstOrDefaultAsync<T>(query);
         }
 
-        public async Task InsertAsync(T obj)
+        public async Task BaseInsertAsync(T obj)
         {
             await Executor.ExecuteAsync(CommandBuilder.AddInsert(obj));
         }
 
-        public async Task UpdateByIdAsync(T obj, string column, object value)
+        public async Task BaseUpdateWhereColumnEqualsAsync(T obj, string column, object value)
         {
             var table = obj.GetTableName();
             var columnValues = obj.GetColumnValues();
 
             await Executor.ExecuteAsync(CommandBuilder.AddUpdateWhereEquals(table, columnValues, column, value));
         }
-
-        public string ColumnName<O>(string property) where O : SimplifyEntity => SimplifyEntityHelper.ColumnName<O>(property);
-
-        public string TableName<O>() where O : SimplifyEntity => SimplifyEntityHelper.TableName<O>();
     }
 }
