@@ -16,14 +16,18 @@ namespace Simplify.ORM
             Executor = executor;
         }
 
-        public string ColumnName<O>(string property) where O : SimplifyEntity => SimplifyEntityHelper.ColumnName<O>(property);
-
+        public string TableName() => SimplifyEntityHelper.TableName<T>();
         public string TableName<O>() where O : SimplifyEntity => SimplifyEntityHelper.TableName<O>();
 
-        public async Task<T> BaseSelectByIdAsync<O>(T obj, string column, object value)
+        public string ColumnName(string property) => SimplifyEntityHelper.ColumnName<T>(property);
+        public string ColumnName<O>(string property) where O : SimplifyEntity => SimplifyEntityHelper.ColumnName<O>(property);
+
+
+        public async Task<T> BaseSelectByColumnEqualsAsync(string column, object value)
         {
-            var table = obj.GetTableName();
-            
+            var entity = Activator.CreateInstance<T>();
+            var table = entity.GetTableName();
+
             var query = QueryBuilder.SelectAllFieldsFrom(table).WhereEquals(table, column, value);
 
             return await Executor.FirstOrDefaultAsync<T>(query);
