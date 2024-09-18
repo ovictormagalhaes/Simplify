@@ -16,6 +16,11 @@ namespace Simplify.ORM
             Executor = executor;
         }
 
+        public ISimplifyQueryBuilder GetQueryBuilder() => QueryBuilder;
+        public ISimplifyCommandBuilder GetCommandBuilder() => CommandBuilder;
+        public ISimplifyExecutor GetExecutor() => Executor;
+
+
         public string TableName() => SimplifyEntityHelper.TableName<T>();
         public string TableName<O>() where O : SimplifyEntity => SimplifyEntityHelper.TableName<O>();
 
