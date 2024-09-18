@@ -25,8 +25,8 @@ namespace Simplify.ORM.Builders
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(Table) && InsertValues.Any())
             {
-                sb.Append($"INSERT INTO {Table} (");
-                sb.Append(string.Join(", ", InsertValues.Select(x => x.Key)));
+                sb.Append($"INSERT INTO {FormatTable(Table)} (");
+                sb.Append(string.Join(", ", InsertValues.Select(x => FormatColumn(x.Key))));
                 sb.Append(") VALUES (");
                 sb.Append(string.Join(", ", InsertValues.Select(x => $"@{x.Key}")));
                 sb.Append(")");
