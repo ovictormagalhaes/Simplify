@@ -280,6 +280,33 @@ namespace Simplify.ORM.Test.Builders
 
         [Theory]
         [MemberData(nameof(Types))]
+        public void WhereInTest(Type type)
+        {
+            var tableName = "User";
+            var column = "UserId";
+
+            var queryBuilder = GetInstance(type)
+                .WhereIn(tableName, column, [1,2,3]);
+            var query = queryBuilder.BuildQuery();
+
+            string expected;
+            if (type == typeof(SimplifySQLServerQueryBuilder))
+                expected = "WHERE [User].[UserId] IN (@UserId00,@UserId01,@UserId02) ;";
+            else if (type == typeof(SimplifyPostgresSQLQueryBuilder))
+                expected = "WHERE \"User\".\"UserId\" IN (@UserId00,@UserId01,@UserId02) ;";
+            else if (type == typeof(SimplifyMySQLQueryBuilder))
+                expected = "WHERE `User`.`UserId` IN (@UserId00,@UserId01,@UserId02) ;";
+            else
+                throw new NotSupportedException("Not suppoted type");
+
+            Assert.Equal(expected, query);
+            SimplifyQueryBuilderAsserts.AssertParameter(queryBuilder, "UserId00", 1);
+            SimplifyQueryBuilderAsserts.AssertParameter(queryBuilder, "UserId01", 2);
+            SimplifyQueryBuilderAsserts.AssertParameter(queryBuilder, "UserId02", 3);
+        }
+
+        [Theory]
+        [MemberData(nameof(Types))]
         public void WhereNotEqualsTest(Type type)
         {
             var tableName = "User";

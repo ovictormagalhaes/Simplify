@@ -112,6 +112,7 @@ namespace Simplify.ORM.Builders
             SimplifyWhereOperation.Lower => "<",
             SimplifyWhereOperation.LowerOrEqual => "<=",
             SimplifyWhereOperation.Between => "BETWEEN",
+            SimplifyWhereOperation.In => "IN",
             _ => throw new ArgumentException("Invalid operation for this method", nameof(operation))
         };
     }

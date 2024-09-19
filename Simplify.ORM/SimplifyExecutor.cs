@@ -124,7 +124,13 @@ namespace Simplify.ORM
             var objectMember = GetPropertyInfo(objectMemberToHydrateExpression);
             var newObjectFK = GetPropertyInfo(newObjectFKExpression);
 
-            var fkValueT = objectFK.GetValue(entities);
+            var fkValuesT = new List<object>();
+
+            foreach (var entity in entities)
+            {
+                var fkValueT = objectFK.GetValue(entity);
+                fkValuesT.Add(fkValueT);
+            }
 
             U entityU = Activator.CreateInstance<U>();
             var tableNameU = entityU.GetTableName();
@@ -132,7 +138,9 @@ namespace Simplify.ORM
 
             var query = _queryBuilder
                 .SelectAllFieldsFrom(tableNameU)
-                .WhereEquals(tableNameU, columnNameFKU, fkValueT);
+                .WhereIn(tableNameU, columnNameFKU, fkValuesT);
+
+            var build = query.BuildQuery();
             var result = await QueryAsync<U>(query);
 
             SetObjectMemberValue(entities, objectMember, result, objectFK, newObjectFK);
@@ -160,12 +168,25 @@ namespace Simplify.ORM
             if (objectMember.PropertyType == typeof(ICollection<U>))
             {
                 var collection = (ICollection<U>)objectMember.GetValue(entity);
+                if (collection == null)
+                {
+                    collection = new List<U>();
+                    objectMember.SetValue(entity, collection);
+                }
+
                 foreach (var item in result)
                     collection.Add(item);
             }
             else if (objectMember.PropertyType == typeof(List<U>))
             {
                 var list = (List<U>)objectMember.GetValue(entity);
+
+                if (list == null)
+                {
+                    list = new List<U>();
+                    objectMember.SetValue(entity, list);
+                }
+
                 foreach (var item in result)
                     list.Add(item);
             }
@@ -198,16 +219,27 @@ namespace Simplify.ORM
 
                 var relatedItems = result.Where(item => newObjectFK.GetValue(item)?.Equals(fkValueT) == true).ToList();
 
+
                 if (objectMember.PropertyType == typeof(ICollection<U>))
                 {
                     var collection = (ICollection<U>)objectMember.GetValue(entity);
-                    foreach (var item in relatedItems)
-                        collection.Add(item);
+                    if (collection == null)
+                    {
+                        collection = new List<U>();
+                        objectMember.SetValue(entity, collection);
+                    }
                 }
                 else if (objectMember.PropertyType == typeof(List<U>))
                 {
                     var list = (List<U>)objectMember.GetValue(entity);
-                    foreach (var item in relatedItems)
+
+                    if (list == null)
+                    {
+                        list = new List<U>();
+                        objectMember.SetValue(entity, list);
+                    }
+
+                    foreach (var item in result)
                         list.Add(item);
                 }
                 else if (objectMember.PropertyType == typeof(U))

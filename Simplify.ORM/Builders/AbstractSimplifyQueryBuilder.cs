@@ -45,13 +45,19 @@ namespace Simplify.ORM.Builders
             foreach (var where in Wheres)
             {
                 var operationSymbol = GetWhereOperationSymbol(where.Operation);
-                var parameterName = !string.IsNullOrEmpty(where.ParameterName) ? FormatParameterName(where.ParameterName!) : null;
+                var parameterName = !string.IsNullOrEmpty(where.ParameterName) ? FormatParameterName(where.ParameterName) : null;
 
                 if (!string.IsNullOrEmpty(where.LeftTable) && !string.IsNullOrEmpty(where.LeftColumn))
                 {
-                    var table = FormatTable(where.LeftTable!);
-                    var column = FormatColumn(where.LeftColumn!);
-                    sb.Append($"{table}.{column} {operationSymbol} {parameterName} ");
+                    var table = FormatTable(where.LeftTable);
+                    var column = FormatColumn(where.LeftColumn);
+
+                    if (where.ParameterValue is IEnumerable<object>)
+                    {
+                        sb.Append($"{table}.{column} {operationSymbol} ({SplitListParameters(where.ParameterName, where.ParameterValue)}) ");
+                    }
+                    else 
+                        sb.Append($"{table}.{column} {operationSymbol} {parameterName} ");
                 }
                 else
                     sb.Append($"{operationSymbol} {parameterName} ");
@@ -77,6 +83,25 @@ namespace Simplify.ORM.Builders
                 sb.Append($"LIMIT {LimitValue} ");
 
             return sb.Append(";").ToString().Replace("  ", " ").TrimEnd();
+        }
+
+        private string SplitListParameters(string key, object value)
+        {
+            if (value is IEnumerable<object> list)
+            {
+                var sb = new StringBuilder();
+                foreach(var v in list)
+                {
+                    var newParameter = GetParameterName(key);
+                    Parameters.Add(newParameter, v);
+                    sb.Append(FormatParameterName(newParameter)).Append(",");
+                }
+                if(sb.Length > 0)
+                    sb.Remove(sb.Length - 1, 1);
+                Parameters.Remove(key);
+                return sb.ToString();
+            }
+            return key;
         }
 
         public Dictionary<string, object> GetParameters() => Parameters;
@@ -220,6 +245,7 @@ namespace Simplify.ORM.Builders
             SimplifyWhereOperation.Lower => "<",
             SimplifyWhereOperation.LowerOrEqual => "<=",
             SimplifyWhereOperation.Between => "BETWEEN",
+            SimplifyWhereOperation.In => "IN",
             _ => throw new ArgumentException("Invalid operation for this method", nameof(operation))
         };
 
@@ -304,23 +330,23 @@ namespace Simplify.ORM.Builders
             return AddWhere(operation, tableName, column, value);
         }
 
-        public ISimplifyQueryBuilder WhereEquals(string tableName, string column, object value, bool conditional = true)
-            => WhereBase(SimplifyWhereOperation.Equals, tableName, column, value, conditional);
+        public ISimplifyQueryBuilder WhereEquals(string table, string column, object value, bool conditional = true)
+            => WhereBase(SimplifyWhereOperation.Equals, table, column, value, conditional);
 
-        public ISimplifyQueryBuilder WhereNotEquals(string tableName, string column, object value, bool conditional = true)
-            => WhereBase(SimplifyWhereOperation.NotEquals, tableName, column, value, conditional);
+        public ISimplifyQueryBuilder WhereNotEquals(string table, string column, object value, bool conditional = true)
+            => WhereBase(SimplifyWhereOperation.NotEquals, table, column, value, conditional);
 
-        public ISimplifyQueryBuilder WhereGreater(string tableName, string column, object value, bool conditional = true)
-            => WhereBase(SimplifyWhereOperation.Greater, tableName, column, value, conditional);
+        public ISimplifyQueryBuilder WhereGreater(string table, string column, object value, bool conditional = true)
+            => WhereBase(SimplifyWhereOperation.Greater, table, column, value, conditional);
 
-        public ISimplifyQueryBuilder WhereGreaterOrEqual(string tableName, string column, object value, bool conditional = true)
-            => WhereBase(SimplifyWhereOperation.GreaterOrEqual, tableName, column, value, conditional);
+        public ISimplifyQueryBuilder WhereGreaterOrEqual(string table, string column, object value, bool conditional = true)
+            => WhereBase(SimplifyWhereOperation.GreaterOrEqual, table, column, value, conditional);
 
-        public ISimplifyQueryBuilder WhereLower(string tableName, string column, object value, bool conditional = true)
-            => WhereBase(SimplifyWhereOperation.Lower, tableName, column, value, conditional);
+        public ISimplifyQueryBuilder WhereLower(string table, string column, object value, bool conditional = true)
+            => WhereBase(SimplifyWhereOperation.Lower, table, column, value, conditional);
 
-        public ISimplifyQueryBuilder WhereLowerOrEqual(string tableName, string column, object value, bool conditional = true)
-            => WhereBase(SimplifyWhereOperation.LowerOrEqual, tableName, column, value, conditional);
+        public ISimplifyQueryBuilder WhereLowerOrEqual(string table, string column, object value, bool conditional = true)
+            => WhereBase(SimplifyWhereOperation.LowerOrEqual, table, column, value, conditional);
 
         public ISimplifyQueryBuilder WhereBetween(string tableName, string column, object from, object to, bool conditional = true)
         {
@@ -328,6 +354,9 @@ namespace Simplify.ORM.Builders
 
             return AddWhere(SimplifyWhereOperation.Between, tableName, column, from).AddWhere(SimplifyWhereOperation.And, column, to);
         }
+
+        public ISimplifyQueryBuilder WhereIn(string table, string column, IEnumerable<object> value, bool conditional = true)
+            => WhereBase(SimplifyWhereOperation.In, table, column, value, conditional);
 
         #endregion
 
@@ -398,11 +427,6 @@ namespace Simplify.ORM.Builders
         public ISimplifyQueryBuilder OrderBy(string table, string column, SimplifyOrderOperation operation = SimplifyOrderOperation.Desc)
         {
             return AddOrderBy(table, column, operation);
-        }
-
-        public ISimplifyQueryBuilder WhereIn(string table, string column, IEnumerable<object> value, bool conditional = true)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion

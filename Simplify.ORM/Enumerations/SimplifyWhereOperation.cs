@@ -11,6 +11,7 @@
         GreaterOrEqual,
         Lower,
         LowerOrEqual,
-        Between
+        Between,
+        In
     }
 }
