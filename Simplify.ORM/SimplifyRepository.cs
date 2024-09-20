@@ -61,7 +61,7 @@ namespace Simplify.ORM
             return await Executor.QueryAsync<T>(query);
         }
 
-        public async Task<IEnumerable<T>> QueryByColumnEqualsAsync(string column, List<object> value)
+        public async Task<IEnumerable<T>> QueryByColumnInAsync(string column, List<object> value)
         {
             var entity = Activator.CreateInstance<T>();
             var table = entity.GetTableName();

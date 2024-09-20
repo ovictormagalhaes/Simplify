@@ -5,6 +5,8 @@ namespace Simplify.ORM.Interfaces
     public interface ISimplifyQueryBuilder
     {
         string BuildQuery();
+        void Clean();
+
         Dictionary<string, object> GetParameters();
 
         string FormatTable(string table);

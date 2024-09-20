@@ -49,7 +49,7 @@ namespace Simplify.ORM
         public async Task ExecuteAsync(ISimplifyCommandBuilder command)
         {
             using var transaction = _connection.BeginTransaction();
-                await _connection.ExecuteAsync(command.BuildQuery(), command.GetParameters());
+            await _connection.ExecuteAsync(command.BuildQuery(), command.GetParameters());
 
             transaction.Commit();
         }
@@ -63,26 +63,42 @@ namespace Simplify.ORM
             transaction.Commit();
         }
 
-        public IEnumerable<T> Query<T>(ISimplifyQueryBuilder queryBuilder) where T : ISimplifyEntity
-            => _connection.Query<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters()).SetIsPersisted();
+        public IEnumerable<T> Query<T>(ISimplifyQueryBuilder queryBuilder) where T : ISimplifyEntity {
+
+            var result = _connection.Query<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters()).SetIsPersisted();
+            queryBuilder.Clean();
+            return result; 
+        }
 
         public IEnumerable<T> Query<T>(ISimplifyQuery query) where T : ISimplifyEntity
             => Query<T>(query.GetBuilder());
 
         public async Task<IEnumerable<T>> QueryAsync<T>(ISimplifyQueryBuilder queryBuilder) where T : ISimplifyEntity
-            => (await _connection.QueryAsync<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters())).SetIsPersisted();
+        {
+            var result = (await _connection.QueryAsync<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters())).SetIsPersisted();
+            queryBuilder.Clean();
+            return result;
+        }
 
         public async Task<IEnumerable<T>> QueryAsync<T>(ISimplifyQuery query) where T : ISimplifyEntity
             => await QueryAsync<T>(query.GetBuilder());
     
         public T FirstOrDefault<T>(ISimplifyQueryBuilder queryBuilder) where T : ISimplifyEntity
-            => _connection.QueryFirstOrDefault<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters()).SetIsPersisted();
+        {
+            T result = _connection.QueryFirstOrDefault<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters()).SetIsPersisted();
+            queryBuilder.Clean();
+            return result;
+        }
 
         public T FirstOrDefault<T>(ISimplifyQuery query) where T : ISimplifyEntity
             => FirstOrDefault<T>(query.GetBuilder());
 
         public async Task<T> FirstOrDefaultAsync<T>(ISimplifyQueryBuilder queryBuilder) where T : ISimplifyEntity
-            => await _connection.QueryFirstOrDefaultAsync<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters());
+        {
+            T result = await _connection.QueryFirstOrDefaultAsync<T>(queryBuilder.BuildQuery(), queryBuilder.GetParameters());
+            queryBuilder.Clean();
+            return result;
+        }
 
         public async Task<T> FirstOrDefaultAsync<T>(ISimplifyQuery query) where T : ISimplifyEntity
             => await FirstOrDefaultAsync<T>(query.GetBuilder());

@@ -15,8 +15,6 @@ namespace Simplify.ORM.Builders
         protected int? TopValue { get; set; }
         protected int? LimitValue { get; set; }
 
-        protected string InsertTable { get; set; }
-
         public virtual string BuildQuery()
         {
             var sb = new StringBuilder();
@@ -83,6 +81,17 @@ namespace Simplify.ORM.Builders
                 sb.Append($"LIMIT {LimitValue} ");
 
             return sb.Append(";").ToString().Replace("  ", " ").TrimEnd();
+        }
+
+        public void Clean()
+        {
+            Parameters = [];
+            Selects = [];
+            Joins = [];
+            Wheres = [];
+            OrdersBy = [];
+            TopValue = null;
+            LimitValue = null;
         }
 
         private string SplitListParameters(string key, object value)

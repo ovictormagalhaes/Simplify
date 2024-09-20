@@ -78,6 +78,7 @@ namespace Simplify.ORM.Test.Entities
         public int MockRelatedEntityId { get; set; }
         public int RelatedEntityId { get; set; }
         public virtual RelatedEntity RelatedEntity { get; set; }
+        public virtual ICollection<RelatedEntity> RelatedEntities { get; set; } = new List<RelatedEntity>();
     }
 
     public partial class RelatedEntity : SimplifyEntity
@@ -89,10 +90,10 @@ namespace Simplify.ORM.Test.Entities
     public partial class TestEntity : SimplifyEntity
     {
         public int Id { get; set; }
-        public ICollection<RelatedEntity> RelatedEntities { get; set; } = new List<RelatedEntity>();
-        public List<RelatedEntity> RelatedEntitiesList { get; set; } = new List<RelatedEntity>();
-        public RelatedEntity SingleRelatedEntity { get; set; }
-        public RelatedEntity? NullableRelatedEntity { get; set; }
+        public virtual ICollection<RelatedEntity> RelatedEntities { get; set; } = new List<RelatedEntity>();
+        public virtual List<RelatedEntity> RelatedEntitiesList { get; set; } = new List<RelatedEntity>();
+        public virtual RelatedEntity SingleRelatedEntity { get; set; }
+        public virtual RelatedEntity? NullableRelatedEntity { get; set; }
     }
 
     public partial class AdditionalEntity : SimplifyEntity
