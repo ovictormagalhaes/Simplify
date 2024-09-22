@@ -136,13 +136,20 @@ namespace Simplify.ORM
                 where T : ISimplifyEntity
                 where U : ISimplifyEntity
         {
+            if (entities == null)
+                return;
+
+            var listEntities = entities.ToList();
+            if (!listEntities.Any())
+                return;
+
             var objectFK = GetPropertyInfo(objectFKExpression);
             var objectMember = GetPropertyInfo(objectMemberToHydrateExpression);
             var newObjectFK = GetPropertyInfo(newObjectFKExpression);
 
             var fkValuesT = new List<object>();
 
-            foreach (var entity in entities)
+            foreach (var entity in listEntities)
             {
                 var fkValueT = objectFK.GetValue(entity);
                 fkValuesT.Add(fkValueT);
